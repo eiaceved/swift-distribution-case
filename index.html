@@ -1,0 +1,1212 @@
+<!doctype html><html><head><meta charset="utf-8"><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}.home-pill{font:600 12px var(--mono,-apple-system);padding:5px 11px;border-radius:999px;color:#fff;background:var(--accent,#0d6b61);text-decoration:none;white-space:nowrap;margin-right:12px}
+</style></head><body>
+<title>Swift Distribution Practice Case</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@75..100,500..800&family=IBM+Plex+Mono:wght@400;500;600&family=Source+Sans+3:ital,wght@0,400;0,600;0,700;1,400&display=swap">
+<style>
+/* Layout: one reading column (max 820px) under a sticky step rail. Every step runs the same loop:
+   interviewer prompt -> your move -> reveal a strong answer. Exhibits sit inside the column like workpapers. */
+:root{
+  --bg:#f2f5f6; --surface:#ffffff; --surface-2:#e8eef0; --fg:#13202a; --fg-2:#44525d; --muted:#6c7a84; --line:#d4dce0;
+  --accent:#0d6b61; --accent-ink:#0a5a51; --accent-soft:#dbeeea; --on-accent:#ffffff;
+  --s1:#2a78d6; --s2:#eb6834; --grid:#e2e8ea; --axis:#b6c1c7;
+  --good:#0ca30c; --good-ink:#006300; --crit:#d03b3b; --crit-ink:#ad2828;
+  --h1:#e6f0fc; --h2:#b7d3f6; --h3:#6da7ec; --h4:#2a78d6; --h5:#104281;
+  --dot:#eb6834; --dot-ink:#111111; --tip-bg:#13202a; --tip-fg:#ffffff;
+  --display:"Archivo","Arial Narrow",system-ui,sans-serif;
+  --body:"Source Sans 3",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --mono:"IBM Plex Mono",ui-monospace,"SFMono-Regular",Menlo,monospace;
+  --r:10px;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#0d1215; --surface:#151c20; --surface-2:#1b252a; --fg:#e5ecef; --fg-2:#a8b4bb; --muted:#7c8992; --line:#29343a;
+    --accent:#4cc2b1; --accent-ink:#72d4c6; --accent-soft:#11302c; --on-accent:#06201c;
+    --s1:#3987e5; --s2:#d95926; --grid:#222c32; --axis:#3a464d;
+    --good:#0ca30c; --good-ink:#3dc43d; --crit:#d03b3b; --crit-ink:#ff8484;
+    --h1:#1a2531; --h2:#1c3c63; --h3:#22599b; --h4:#3987e5; --h5:#86b6ef;
+    --dot:#f07a45; --dot-ink:#111111; --tip-bg:#e5ecef; --tip-fg:#0d1215;
+    color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0d1215; --surface:#151c20; --surface-2:#1b252a; --fg:#e5ecef; --fg-2:#a8b4bb; --muted:#7c8992; --line:#29343a;
+  --accent:#4cc2b1; --accent-ink:#72d4c6; --accent-soft:#11302c; --on-accent:#06201c;
+  --s1:#3987e5; --s2:#d95926; --grid:#222c32; --axis:#3a464d;
+  --good:#0ca30c; --good-ink:#3dc43d; --crit:#d03b3b; --crit-ink:#ff8484;
+  --h1:#1a2531; --h2:#1c3c63; --h3:#22599b; --h4:#3987e5; --h5:#86b6ef;
+  --dot:#f07a45; --dot-ink:#111111; --tip-bg:#e5ecef; --tip-fg:#0d1215;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--fg);font:17px/1.6 var(--body);-webkit-font-smoothing:antialiased}
+.wrap{max-width:820px;margin:0 auto;padding-inline:20px}
+h1,h2,h3{font-family:var(--display);font-stretch:86%;text-wrap:balance;margin:0;letter-spacing:-.01em}
+p{margin:0 0 .8em}
+a{color:var(--accent-ink)}
+b,strong{font-weight:700}
+.eyebrow,.lbl,.who{font:500 11px/1.4 var(--mono);letter-spacing:.09em;text-transform:uppercase}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-radius:4px}
+.tnum{font-variant-numeric:tabular-nums}
+
+/* rail */
+.rail{position:sticky;top:env(safe-area-inset-top,0px);z-index:20;background:var(--bg);border-bottom:1px solid var(--line)}
+.rail-in{max-width:820px;margin:0 auto;padding:8px 20px;display:flex;gap:10px;align-items:center}
+.chips{display:flex;gap:4px;overflow-x:auto;flex:1;min-width:0;scrollbar-width:none;padding-block:2px}
+.chips::-webkit-scrollbar{display:none}
+.chips a{font:500 12px var(--mono);padding:5px 9px;border-radius:999px;color:var(--fg-2);white-space:nowrap;text-decoration:none}
+.chips a:hover{background:var(--surface-2)}
+.chips a.on{background:var(--fg);color:var(--bg)}
+.speed{display:flex;align-items:center;gap:6px;font:500 11px var(--mono);color:var(--muted);flex:none}
+.speed select{font:500 12px var(--mono);background:var(--surface);color:var(--fg);border:1px solid var(--line);border-radius:6px;padding:3px 4px}
+
+/* hero */
+.hero{padding-block:56px 40px}
+.hero .eyebrow{color:var(--accent-ink);margin-bottom:14px}
+.hero h1{font-size:clamp(40px,8vw,64px);line-height:1;font-weight:800;font-stretch:80%}
+.lede{font-size:21px;line-height:1.5;color:var(--fg-2);max-width:36em;margin-top:18px}
+.how{list-style:none;padding:0;margin:26px 0 0;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+.how li{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:12px 14px;font-size:15px;line-height:1.4;counter-increment:how}
+.how li::before{content:counter(how);display:block;font:600 12px var(--mono);color:var(--accent-ink);margin-bottom:4px}
+.hero-actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:22px}
+
+/* steps */
+.step{padding-block:52px;border-top:1px solid var(--line);scroll-margin-top:56px}
+.sh{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.idx{font:600 13px var(--mono);color:var(--accent-ink)}
+.sh h2{font-size:clamp(26px,4.4vw,32px);line-height:1.15;font-weight:750}
+.sh .listen{margin-left:auto}
+.sub{color:var(--fg-2);margin-top:8px;max-width:40em}
+
+.btn{font:600 14px/1.2 var(--body);border-radius:8px;padding:9px 14px;border:1px solid var(--line);background:var(--surface);color:var(--fg);cursor:pointer;display:inline-flex;align-items:center;gap:7px;text-decoration:none}
+.btn:hover{border-color:var(--muted)}
+.btn.primary{background:var(--accent);color:var(--on-accent);border-color:var(--accent)}
+.btn.primary:hover{filter:brightness(1.07)}
+.btn.small{font-size:13px;padding:6px 10px}
+.btn[aria-pressed="true"]{background:var(--fg);color:var(--bg);border-color:var(--fg)}
+.btn svg{width:14px;height:14px;fill:currentColor;flex:none}
+
+.iv{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:20px 22px;margin-top:22px}
+.who{color:var(--muted);margin-bottom:8px}
+.iv p{font-size:19px;line-height:1.55}
+.iv p:last-child{margin-bottom:0}
+
+.move{display:flex;gap:12px 16px;align-items:center;flex-wrap:wrap;margin-top:18px;padding-block:14px;border-top:1px dashed var(--line);border-bottom:1px dashed var(--line)}
+.move .lbl{color:var(--accent-ink);flex:none}
+.move p{margin:0;flex:1 1 260px;min-width:0;font-weight:600}
+.move .acts{display:flex;gap:8px;flex-wrap:wrap}
+
+.ans{background:var(--accent-soft);border-radius:var(--r);padding:20px 22px;margin-top:14px}
+.ans .who{color:var(--accent-ink)}
+.ans h3{font-size:19px;margin:18px 0 8px;font-weight:700}
+.ans h3:first-of-type{margin-top:4px}
+.ans ul{margin:0 0 .6em;padding-left:1.2em}
+.ans li{margin-bottom:.35em}
+.script{font-size:18px;line-height:1.6}
+.script p{margin-bottom:.7em}
+.note{font-size:15px;color:var(--fg-2)}
+
+/* facts strip */
+.facts{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:1px;background:var(--line);border:1px solid var(--line);border-radius:var(--r);overflow:hidden;margin-top:16px}
+.facts div{background:var(--surface);padding:12px 14px;min-width:0}
+.facts .k{font:500 11px var(--mono);letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+.facts .v{font:700 22px/1.2 var(--display);font-stretch:86%;margin-top:4px}
+.facts .d{font-size:13px;color:var(--fg-2);line-height:1.35;margin-top:2px}
+
+/* primer */
+.def{font:600 clamp(21px,3.4vw,26px)/1.35 var(--display);font-stretch:92%;margin-top:22px;max-width:30em}
+.split{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;margin-top:22px}
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:16px 18px;min-width:0}
+.panel h3{font-size:19px;font-weight:700}
+.panel .tag{font:500 11px var(--mono);color:var(--muted);letter-spacing:.06em;text-transform:uppercase;margin:2px 0 8px}
+.panel ul{margin:0;padding-left:1.1em;font-size:16px}
+.panel li{margin-bottom:.3em}
+.cycle{list-style:none;padding:0;margin:14px 0 0;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:22px}
+.cycle li{position:relative;background:var(--surface-2);border-radius:8px;padding:12px 12px 10px;min-width:0}
+.cycle li b{display:block;font:700 17px var(--display);font-stretch:88%}
+.cycle li span{font-size:14px;color:var(--fg-2);line-height:1.35;display:block;margin-top:2px}
+.cycle li:not(:last-child)::after{content:"";position:absolute;right:-17px;top:50%;width:12px;height:12px;border-top:2px solid var(--muted);border-right:2px solid var(--muted);transform:translateY(-50%) rotate(45deg)}
+.cycle-note{font:500 12px var(--mono);color:var(--muted);margin-top:10px}
+.vocab{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-top:16px}
+.term{background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:12px 14px;min-width:0}
+.term b{display:block;font:700 16px var(--display);font-stretch:90%;margin-bottom:3px}
+.term p{margin:0;font-size:15px;line-height:1.45;color:var(--fg-2)}
+.h-sec{font:500 11px var(--mono);letter-spacing:.09em;text-transform:uppercase;color:var(--muted);margin-top:30px}
+
+/* qa list */
+.qa{list-style:none;padding:0;margin:0;display:grid;gap:10px}
+.qa li{background:var(--surface);border-radius:8px;padding:12px 14px}
+.qa .q{font-weight:700}
+.qa .a{color:var(--fg-2);margin-top:2px}
+.qa .a::before{content:"Interviewer: ";font:500 11px var(--mono);letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+
+/* framework tree */
+.tree{margin-top:6px}
+.root{background:var(--fg);color:var(--bg);border-radius:8px;padding:12px 16px;font:700 18px/1.3 var(--display);font-stretch:90%;text-align:center;position:relative}
+.root::after{content:"";position:absolute;left:50%;bottom:-16px;width:2px;height:16px;background:var(--muted)}
+.branches{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin-top:16px;padding-top:14px;border-top:2px solid var(--muted)}
+.branch{background:var(--surface);border-radius:8px;padding:12px 13px;min-width:0}
+.branch .n{font:600 12px var(--mono);color:var(--accent-ink)}
+.branch b{display:block;font:700 16px/1.25 var(--display);font-stretch:90%;margin:2px 0 6px}
+.branch ul{margin:0;padding-left:1.05em;font-size:14.5px;line-height:1.4}
+.branch li{margin-bottom:.3em}
+
+/* exhibits */
+.ex{margin:22px 0 0;background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:18px 18px 14px}
+.ex-h{display:flex;justify-content:space-between;align-items:baseline;gap:6px 12px;flex-wrap:wrap}
+.ex-t{font:700 18px var(--display);font-stretch:88%}
+.ex-ref{font:500 12px var(--mono);color:var(--muted)}
+.ex-s{font-size:14px;color:var(--fg-2);margin-top:2px}
+.ex figcaption,.src{font:400 12px/1.45 var(--mono);color:var(--muted);margin-top:12px}
+.multiples{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-top:14px}
+.mini{border:1px solid var(--grid);border-radius:8px;padding:10px 10px 4px;min-width:0}
+.mini .nm{font-weight:700;font-size:14.5px;line-height:1.25;min-height:2.5em}
+.mini .ch{font:500 12px var(--mono);color:var(--fg-2)}
+.mini svg{display:block;width:100%;height:auto;margin-top:4px}
+.tblwrap{overflow-x:auto;margin-top:12px}
+table{border-collapse:collapse;width:100%;font-size:14.5px}
+th,td{text-align:left;padding:7px 10px;border-bottom:1px solid var(--grid);white-space:nowrap}
+th{font:500 11px var(--mono);letter-spacing:.05em;text-transform:uppercase;color:var(--muted)}
+td.n,th.n{text-align:right;font-variant-numeric:tabular-nums}
+
+.hbar{margin-top:16px}
+.hrow{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.5fr);gap:4px 14px;align-items:center;padding-block:9px;border-bottom:1px solid var(--grid)}
+.hrow:last-of-type{border-bottom:0}
+.hlab b{display:block;font-size:15px;line-height:1.3}
+.hlab span{font-size:13px;color:var(--fg-2);line-height:1.3;display:block}
+.track{position:relative;height:26px}
+.bar{position:absolute;left:0;top:5px;height:16px;border-radius:0 4px 4px 0;background:var(--s1);min-width:2px}
+.bar.b2{background:var(--s2)}
+.bval{position:absolute;top:2px;font:600 13px var(--mono);color:var(--fg);white-space:nowrap;padding-left:6px}
+.tol{position:absolute;top:-4px;bottom:-4px;width:0;border-left:1.5px solid var(--fg-2)}
+.axis{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.5fr);gap:14px}
+.ticks{position:relative;height:18px;font:500 11px var(--mono);color:var(--muted);border-top:1px solid var(--axis)}
+.ticks span{position:absolute;top:3px;transform:translateX(-50%)}
+.ticks span:first-child{transform:none}
+.ticks span:last-child{transform:translateX(-100%)}
+.status{font:600 12px var(--mono);display:inline-flex;gap:5px;align-items:center;margin-top:3px}
+.status.bad{color:var(--crit-ink)} .status.ok{color:var(--good-ink)}
+.legend{display:flex;gap:16px;flex-wrap:wrap;font-size:14px;color:var(--fg-2);margin-top:10px}
+.legend span{display:inline-flex;align-items:center;gap:6px}
+.legend i{width:12px;height:12px;border-radius:3px;display:inline-block}
+.tolnote{font:500 12px var(--mono);color:var(--fg-2);margin-top:8px}
+
+/* given table + calc steps */
+.given{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:1px;background:var(--line);border:1px solid var(--line);border-radius:var(--r);overflow:hidden;margin-top:16px}
+.given div{background:var(--surface);padding:11px 13px;min-width:0}
+.given .k{font-size:13px;color:var(--fg-2);line-height:1.3}
+.given .v{font:700 20px/1.2 var(--display);font-stretch:88%;margin-top:3px}
+.calc{list-style:none;padding:0;margin:0;display:grid;gap:8px}
+.calc li{background:var(--surface);border-radius:8px;padding:12px 14px;display:grid;grid-template-columns:minmax(0,1fr) auto;gap:2px 14px;align-items:center}
+.calc .t{font:500 11px var(--mono);letter-spacing:.06em;text-transform:uppercase;color:var(--muted);grid-column:1/-1}
+.calc .f{font-size:16px;min-width:0}
+.calc .r{font:700 20px var(--display);font-stretch:88%;text-align:right;white-space:nowrap}
+.stepper .row{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+.chipset{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+.chipset span{font:500 12px var(--mono);background:var(--surface);border-radius:6px;padding:4px 8px;color:var(--fg-2)}
+.chipset b{color:var(--fg)}
+
+/* heat map */
+.heat{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,1fr);gap:18px;align-items:start;margin-top:12px}
+.heat svg{width:100%;height:auto;display:block}
+.heat svg text{font-family:var(--mono)}
+.reg{list-style:none;padding:0;margin:0;display:grid;gap:6px}
+.reg li{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:10px;align-items:center;font-size:14.5px;line-height:1.3;padding-block:6px;border-bottom:1px solid var(--grid)}
+.reg .id{width:28px;height:28px;border-radius:50%;background:var(--dot);color:var(--dot-ink);font:600 11px var(--mono);display:grid;place-items:center}
+.reg .sc{font:600 13px var(--mono);color:var(--fg-2);text-align:right;white-space:nowrap}
+.ramp{display:flex;align-items:center;gap:6px;font:500 11px var(--mono);color:var(--muted);margin-top:10px}
+.ramp i{width:22px;height:10px;display:inline-block;border-radius:2px}
+
+/* roadmap */
+.road{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-top:8px}
+.phase{background:var(--surface);border-radius:8px;padding:12px 14px;min-width:0}
+.phase .d{font:600 12px var(--mono);color:var(--accent-ink)}
+.phase b{display:block;font:700 18px var(--display);font-stretch:88%;margin:2px 0 6px}
+.phase ul{margin:0;padding-left:1.05em;font-size:15px;line-height:1.4}
+.phase li{margin-bottom:.35em}
+.struct{display:flex;flex-wrap:wrap;gap:6px;margin:4px 0 12px}
+.struct span{font:600 12px var(--mono);padding:4px 9px;border-radius:999px;background:var(--surface);color:var(--fg)}
+
+/* drivers */
+.drivers{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-top:6px}
+.drivers div{background:var(--surface);border-radius:8px;padding:11px 13px;min-width:0}
+.drivers b{display:block;font:700 16px var(--display);font-stretch:90%}
+.drivers p{margin:2px 0 0;font-size:15px;color:var(--fg-2);line-height:1.45}
+.eq{font:600 15px var(--mono);background:var(--surface);border-radius:8px;padding:10px 14px;margin:6px 0 12px;overflow-x:auto}
+.drill{margin-top:34px}
+.drill h3{font-size:22px;font-weight:750}
+
+/* multiple choice */
+.mc{margin-top:20px}
+.mc-head{display:flex;gap:10px;align-items:flex-start}
+.stem{font-weight:700;font-size:18px;line-height:1.45;margin:0 0 10px;flex:1;min-width:0}
+.opts{display:grid;gap:8px}
+.opt{text-align:left;display:flex;gap:10px;align-items:flex-start;padding:11px 14px;border:1px solid var(--line);border-radius:8px;background:var(--surface);color:var(--fg);font:inherit;font-size:16px;line-height:1.45;cursor:pointer;width:100%}
+.opt:hover:not([disabled]){border-color:var(--muted)}
+.opt[disabled]{cursor:default}
+.opt .L{font:600 13px/1.6 var(--mono);color:var(--muted);flex:none}
+.opt .x{flex:1;min-width:0}
+.opt .tag{font:600 12px/1.7 var(--mono);white-space:nowrap;flex:none}
+.opt.right{border-color:var(--good);background:color-mix(in srgb,var(--good) 10%,var(--surface))}
+.opt.right .tag{color:var(--good-ink)}
+.opt.wrong{border-color:var(--crit);background:color-mix(in srgb,var(--crit) 9%,var(--surface))}
+.opt.wrong .tag{color:var(--crit-ink)}
+.why{margin-top:10px;padding:13px 16px;border-radius:8px;background:var(--surface-2);font-size:16px}
+.why p:last-child{margin-bottom:0}
+.test .mc{border-top:1px solid var(--line);padding-top:20px;margin-top:22px}
+.test .mc:first-of-type{border-top:0;padding-top:0}
+.qn{font:600 13px var(--mono);color:var(--accent-ink);display:block;margin-bottom:2px}
+.scorebar{position:sticky;top:calc(env(safe-area-inset-top,0px) + 50px);z-index:5;display:flex;gap:12px;align-items:center;flex-wrap:wrap;background:var(--bg);padding-block:10px;margin-top:14px;border-bottom:1px solid var(--line)}
+.score{font:700 22px var(--display);font-stretch:86%}
+.score small{font:500 12px var(--mono);color:var(--muted);margin-left:6px}
+.done{background:var(--accent-soft);border-radius:var(--r);padding:16px 18px;margin-top:24px}
+
+footer{padding-block:40px 64px;border-top:1px solid var(--line);font-size:14px;color:var(--fg-2)}
+
+#tip{position:fixed;z-index:50;pointer-events:none;background:var(--tip-bg);color:var(--tip-fg);font:500 12px/1.4 var(--mono);padding:6px 9px;border-radius:6px;max-width:260px;box-shadow:0 4px 14px rgba(0,0,0,.18)}
+
+@media (max-width:760px){
+  .branches{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .facts{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .heat{grid-template-columns:minmax(0,1fr)}
+  .road{grid-template-columns:minmax(0,1fr)}
+  .multiples{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
+@media (max-width:600px){
+  body{font-size:16px}
+  .how{grid-template-columns:minmax(0,1fr)}
+  .split,.vocab,.drivers{grid-template-columns:minmax(0,1fr)}
+  .cycle{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .cycle li:nth-child(2)::after{display:none}
+  .given{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .hrow,.axis{grid-template-columns:minmax(0,1fr)}
+  .axis>div:first-child{display:none}
+  .iv p{font-size:18px}
+  .speed span{display:none}
+}
+@media (max-width:420px){
+  .branches{grid-template-columns:minmax(0,1fr)}
+}
+@media (prefers-reduced-motion:no-preference){
+  .ans:not([hidden]),.why:not([hidden]),.calc li:not([hidden]){animation:rise .28s ease-out}
+  @keyframes rise{from{transform:translateY(4px);opacity:.4}to{transform:none;opacity:1}}
+  html{scroll-behavior:smooth}
+}
+[hidden]:not([hidden=until-found i]){display:none!important}
+/* scoring register */
+.btn[disabled]{opacity:.45;cursor:not-allowed}
+.seg{display:flex;gap:6px;flex-wrap:wrap;margin:14px 0 4px}
+.scorer li{grid-template-columns:auto minmax(0,1fr) auto}
+.scorer .nm{min-width:0}
+.pick{display:flex;gap:6px;align-items:center}
+.pick select{font:500 13px var(--mono);background:var(--surface);color:var(--fg);border:1px solid var(--line);border-radius:6px;padding:4px 4px;min-width:44px}
+.pick .sc{min-width:34px}
+.reg .w{display:block;font-size:13px;color:var(--fg-2);margin-top:2px;line-height:1.35}
+.reg .nm b{font-weight:600}
+.mytop{font:600 15px/1.4 var(--body);margin:12px 0 0;color:var(--fg)}
+.mapnote{font:500 12px var(--mono);color:var(--fg-2);margin:8px 0 0}
+.bar.b3{background:var(--fg-2)}
+/* voice menu */
+.voicebar{display:flex;flex-wrap:wrap;gap:8px 10px;align-items:center;margin-top:22px;padding:12px 14px;background:var(--surface);border:1px solid var(--line);border-radius:var(--r)}
+.voicebar label{font:500 11px var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.voicebar select{flex:1 1 220px;min-width:0;max-width:100%;font:500 13px var(--mono);background:var(--surface);color:var(--fg);border:1px solid var(--line);border-radius:6px;padding:6px 6px}
+.vhint{flex-basis:100%;margin:0;font-size:14px;line-height:1.45;color:var(--fg-2)}
+@media (max-width:600px){.given>div:last-child:nth-child(odd){grid-column:1/-1}}
+@media (max-width:420px){
+  .scorer li{grid-template-columns:auto minmax(0,1fr)}
+  .scorer .pick{grid-column:2}
+}
+</style>
+<style>
+/* Swift page extras: sorting drill, math checks, segment table */
+.sorter{list-style:none;padding:0;margin:14px 0 0;display:grid;gap:8px}
+.sorter li{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:6px 12px;align-items:center;background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:10px 12px}
+.sorter li span.t{min-width:0;font-size:16px;line-height:1.4}
+.sorter select,.mathq input{font:500 14px var(--mono);background:var(--surface);color:var(--fg);border:1px solid var(--line);border-radius:6px;padding:6px 8px}
+.sorter .fb,.mathq .fb{grid-column:1/-1;font-size:14px;line-height:1.45;color:var(--fg-2);margin:0}
+.sorter li.ok{border-color:var(--good)}
+.sorter li.bad{border-color:var(--crit)}
+.fbtag{font:600 12px var(--mono);margin-right:6px}
+.fbtag.ok{color:var(--good-ink)}
+.fbtag.bad{color:var(--crit-ink)}
+.sortbar{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-top:12px}
+.sortscore{font:600 15px var(--body)}
+.mathq{display:grid;grid-template-columns:minmax(0,1fr) auto auto;gap:8px 10px;align-items:center;padding-block:12px;border-bottom:1px solid var(--grid)}
+.mathq .q{font-size:17px;min-width:0}
+.mathq input{width:120px}
+.segtbl td,.segtbl th{white-space:normal;min-width:84px;vertical-align:top}
+.segtbl td:first-child{font-weight:700;min-width:90px}
+.segtbl .hbs{width:16px;height:16px;vertical-align:-3px;margin-right:6px;color:var(--fg)}
+.reps{display:grid;gap:12px;margin-top:14px}
+.rep{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:14px 16px}
+.rep .rq{font-weight:700;font-size:17px;margin:0 0 8px}
+.rep .acts{display:flex;gap:8px;flex-wrap:wrap}
+.rep .ans{margin-top:12px}
+@media (max-width:420px){.mathq{grid-template-columns:minmax(0,1fr) auto}.mathq .q{grid-column:1/-1}}
+</style>
+
+<nav class="rail" aria-label="Case steps">
+  <div class="rail-in">
+    <a class="home-pill" href="/">All cases</a>
+    <div class="chips" id="chips">
+      <a href="#primer">Primer</a><a href="#prompt">Prompt</a><a href="#clarify">Clarify</a><a href="#framework">Q1 Framework</a><a href="#sort">Sort drill</a><a href="#ex1">Q2 Exhibit</a><a href="#sizing">Math check</a><a href="#q3">Q3</a><a href="#prioritize">Ideas</a><a href="#recommend">Recommend</a><a href="#drills">Drills</a><a href="#test">Test</a>
+    </div>
+    <label class="speed" for="rate"><span>Speed</span>
+      <select id="rate" aria-label="Read-aloud speed">
+        <option value="0.9">0.9×</option><option value="1" selected>1×</option><option value="1.15">1.15×</option><option value="1.3">1.3×</option>
+      </select>
+    </label>
+  </div>
+</nav>
+
+<main>
+<header class="hero wrap">
+  <p class="eyebrow">Practice case · McKinsey workshop style · interviewer-led · about 40 minutes</p>
+  <h1>Swift Distribution</h1>
+  <p class="lede" data-say>A distributor known for great service has watched its revenue fall three years in a row while cheaper rivals take customers. Find the root cause of the profit decline, and a way back to where profits used to be.</p>
+  <ol class="how">
+    <li><b>Listen or read</b> the interviewer's prompt. Every step has a Listen button.</li>
+    <li><b>Answer out loud</b> before you reveal anything. Use the timers.</li>
+    <li><b>Compare</b> with the strong answer, then move to the next step.</li>
+  </ol>
+  <div class="hero-actions">
+    <a class="btn primary" href="#prompt">Start the case</a>
+    <a class="btn" href="#framework">Jump to framework practice</a>
+    <a class="btn" href="#test">Jump to the practice test</a>
+  </div>
+  <div class="voicebar">
+    <label for="voicePick">Read-aloud voice</label>
+    <select id="voicePick"></select>
+    <button class="btn small" type="button" id="voiceTest">Try it</button>
+    <p class="vhint">Sounds robotic? Pick a voice marked "natural." For the most human voices, open this page in Microsoft Edge, which includes free natural voices. On a Mac, you can also download a Premium voice in System Settings › Accessibility › Spoken Content › System voice › Manage Voices.</p>
+  </div>
+</header>
+
+<div class="wrap">
+
+<!-- 01 PRIMER -->
+<section class="step" id="primer">
+  <div class="sh"><span class="idx">01</span><h2>How this case works</h2><button class="btn small listen" type="button">Listen</button></div>
+  <p class="def" data-say>This is an interviewer-led case. The interviewer asks questions in order: build a framework, read an exhibit, do some math, then give a recommendation.</p>
+  <p class="sub" data-say>Each question has one job. The framework shows you can organize a problem. The exhibit shows you can spot what matters in data. The math shows you can stay accurate under pressure.</p>
+
+  <div class="split">
+    <div class="panel">
+      <h3>The workshop's hints</h3>
+      <p class="tag">From the case slides, in short</p>
+      <ul data-say>
+        <li>Take time to organize your thoughts before you answer.</li>
+        <li>Lay out an overall approach before diving into details.</li>
+        <li>Write down important facts as you hear them.</li>
+        <li>Ask the interviewer to explain anything that isn't clear.</li>
+        <li>Look for trends in the data that aren't obvious at first glance.</li>
+      </ul>
+    </div>
+    <div class="panel">
+      <h3>What a strong answer shows</h3>
+      <p class="tag">The same in every question</p>
+      <ul data-say>
+        <li>A logical structure, even if your guess turns out wrong.</li>
+        <li>Clean, simple math, said out loud.</li>
+        <li>A hypothesis you test with the data.</li>
+        <li>The answer first, then the reasons.</li>
+      </ul>
+    </div>
+  </div>
+
+  <p class="h-sec">The shape of this case</p>
+  <ol class="cycle" data-say aria-label="Framework, exhibit, math, recommend">
+    <li><b>Q1 Framework</b><span>What could cause the drop?</span></li>
+    <li><b>Q2 Exhibit</b><span>Where is it coming from?</span></li>
+    <li><b>Q3 Math</b><span>What closes the gap?</span></li>
+    <li><b>Recommend</b><span>Answer first.</span></li>
+  </ol>
+  <p class="cycle-note">Question 3 is a new practice question added to this version</p>
+
+  <p class="h-sec">Ten terms to drop naturally</p>
+  <div class="vocab">
+    <div class="term" data-say><b>Distributor</b><p>A middleman that buys in bulk from manufacturers, stores the goods, and delivers smaller amounts to retailers.</p></div>
+    <div class="term" data-say><b>COGS</b><p>Cost of goods sold: what Swift pays for the products it resells. It rises and falls with sales.</p></div>
+    <div class="term" data-say><b>OpEx</b><p>Operating expenses: day-to-day running costs, like sales teams and customer support.</p></div>
+    <div class="term" data-say><b>Fixed costs</b><p>Costs that stay about the same when sales change, like warehouse leases and technology.</p></div>
+    <div class="term" data-say><b>Profit margin</b><p>Profit as a share of revenue. 10 million of profit on 100 million of revenue is a 10 percent margin.</p></div>
+    <div class="term" data-say><b>Market share</b><p>Swift's sales divided by the whole market. 40 million out of a 200 million market is 20 percent.</p></div>
+    <div class="term" data-say><b>Sales mix</b><p>How revenue splits across segments or customer types. A shift in mix can change profit even if total sales hold.</p></div>
+    <div class="term" data-say><b>Key buying factors</b><p>What customers care about most when choosing a supplier, like price or service.</p></div>
+    <div class="term" data-say><b>Cost to serve</b><p>What it costs to deliver to and support one customer. Fast delivery and great support raise it.</p></div>
+    <div class="term" data-say><b>Harvey ball</b><p>A circle filled a quarter, half, or three-quarters to show low, medium, or high. Consulting slides use them a lot.</p></div>
+  </div>
+</section>
+
+<!-- 02 PROMPT -->
+<section class="step" id="prompt">
+  <div class="sh"><span class="idx">02</span><h2>The case prompt</h2><button class="btn small listen" type="button">Listen</button></div>
+  <div class="iv">
+    <p class="who">Interviewer</p>
+    <p data-say>Our client is Swift Distribution, a national distributor of consumer goods that serves retail clients across North America. Swift buys products in bulk from manufacturers, stores them, and delivers smaller quantities to retailers like supermarkets and specialty stores. It often adds services like inventory management and transportation.</p>
+    <p data-say>Swift carries everything from electronics to household products. It's known for industry-leading service: fast delivery and excellent customer support.</p>
+    <p data-say>But for the past three years, Swift's revenue has dropped every year. Lower-cost competitors are winning customers with cheaper prices, even though they can't match Swift's service. The CEO has asked us to find the root cause of the decline in profits, and to get profits back to historic levels.</p>
+  </div>
+  <div class="facts">
+    <div><div class="k">Business</div><div class="v">Distributor</div><div class="d">Between manufacturers and retailers</div></div>
+    <div><div class="k">Region</div><div class="v">N. America</div><div class="d">Retail clients nationwide</div></div>
+    <div><div class="k">Edge</div><div class="v">Service</div><div class="d">Fast delivery, strong support</div></div>
+    <div><div class="k">Problem</div><div class="v">3 years</div><div class="d">Of falling revenue</div></div>
+  </div>
+  <div class="move">
+    <span class="lbl">Your move</span>
+    <p data-say>Restate the question in one sentence before you do anything else.</p>
+    <div class="acts"><button class="btn small timer" type="button" data-secs="20">20s timer</button><button class="btn primary small reveal" type="button" aria-controls="a-prompt" aria-expanded="false">Show a strong answer</button></div>
+  </div>
+  <div class="ans" id="a-prompt" hidden>
+    <p class="who">Strong answer</p>
+    <div class="script"><p data-say>"So Swift's profits have been falling as cheaper competitors take customers, and the CEO wants us to find the root cause and get profits back to where they were. Is that right?"</p></div>
+    <p class="note" data-say>Interviewer: "Yes, exactly." Notice the restatement names both parts: find the cause, and fix it.</p>
+  </div>
+</section>
+
+<!-- 03 CLARIFY -->
+<section class="step" id="clarify">
+  <div class="sh"><span class="idx">03</span><h2>Clarifying questions</h2><button class="btn small listen" type="button">Listen</button></div>
+  <div class="move">
+    <span class="lbl">Your move</span>
+    <p data-say>Ask two or three clarifying questions. Pick ones whose answers would change your approach.</p>
+    <div class="acts"><button class="btn small timer" type="button" data-secs="60">60s timer</button><button class="btn primary small reveal" type="button" aria-controls="a-clarify" aria-expanded="false">Show strong questions</button></div>
+  </div>
+  <div class="ans" id="a-clarify" hidden>
+    <p class="who">Strong questions, with practice answers</p>
+    <ul class="qa">
+      <li data-say><div class="q">What does "historic levels" mean in dollars?</div><div class="a">About 14 million dollars of profit a year, where it was two years ago.</div></li>
+      <li data-say><div class="q">Who are the lower-cost competitors?</div><div class="a">Newer distributors that offer fewer services at lower prices. They can't match Swift's delivery speed or support.</div></li>
+      <li data-say><div class="q">Is the decline across all product types, or some?</div><div class="a">Good question. We have a breakdown by segment that we'll show you shortly.</div></li>
+      <li data-say><div class="q">Any constraints on the solution?</div><div class="a">The CEO doesn't want to give up Swift's reputation for great service.</div></li>
+    </ul>
+    <p class="note" style="margin-top:12px" data-say>These answers were written for practice; the workshop didn't share them. In a real interview, write down every number you hear.</p>
+  </div>
+</section>
+
+<!-- 04 Q1 FRAMEWORK -->
+<section class="step" id="framework">
+  <div class="sh"><span class="idx">04</span><h2>Question 1: build the framework</h2><button class="btn small listen" type="button">Listen</button></div>
+  <div class="iv">
+    <p class="who">Interviewer</p>
+    <p data-say>What factors would you consider when investigating why Swift is experiencing a decline in profits?</p>
+  </div>
+  <div class="move">
+    <span class="lbl">Your move</span>
+    <p data-say>Take 60 to 90 seconds. Start with the overall split, profit equals revenue minus costs, then add what else could matter. Write it down, then walk through it out loud.</p>
+    <div class="acts"><button class="btn small timer" type="button" data-secs="90">90s timer</button><button class="btn primary small reveal" type="button" aria-controls="a-frame" aria-expanded="false">Show a strong framework</button></div>
+  </div>
+  <div class="ans" id="a-frame" hidden>
+    <p class="who">Strong framework, close to the workshop's model answer</p>
+    <div class="tree">
+      <div class="root">What could be driving Swift's decline in profits?</div>
+      <div class="branches" style="grid-template-columns:repeat(3,minmax(0,1fr))">
+        <div class="branch"><span class="n">1</span><b>Revenue: is it falling?</b><ul><li><b>Products:</b> which categories earn the most, and did price or units change?</li><li><b>Customers:</b> sales by customer type, satisfaction, fewer customers or new needs?</li><li><b>Operations:</b> changes to delivery or suppliers that hurt service?</li></ul></div>
+        <div class="branch"><span class="n">2</span><b>Costs: are they rising?</b><ul><li><b>Type of cost:</b> fixed, like leases and technology, or variable, like trucking and fuel?</li><li><b>Market factors:</b> a recession or inflation pushing costs up?</li><li><b>Suppliers:</b> who they are, and what they charge?</li></ul></div>
+        <div class="branch"><span class="n">3</span><b>Other: what else matters?</b><ul><li><b>Competitors:</b> their prices, market share, and reach?</li><li><b>Organization:</b> changes to Swift's teams or key departments?</li><li><b>Technology:</b> how Swift manages distribution, and how that affects sales?</li></ul></div>
+      </div>
+    </div>
+    <h3>Say it like this</h3>
+    <div class="script">
+      <p data-say>"Profit is revenue minus costs, so I'd check both sides, then look at outside factors. On revenue, I'd look at products, which categories earn the most and whether price or volume changed; customers, which types buy from us, and whether we're losing them; and operations, whether anything changed in how we deliver. On costs, I'd split fixed costs, like leases and technology, from variable costs, like trucking, and check market factors and supplier prices. Then other factors: competitors' pricing and share, any changes inside Swift, and technology. Since we know cheaper rivals are taking customers, my hypothesis is that revenue is the main problem, so I'd like to start with revenue by product segment."</p>
+    </div>
+    <h3>Why it works</h3>
+    <ul data-say>
+      <li>It starts with the overall split, revenue and costs, before details, which is what the workshop's hint asks for.</li>
+      <li>It has a home for every idea: the "other" bucket catches competitors and internal changes.</li>
+      <li>It ends with a hypothesis and a data request, which moves the case forward.</li>
+    </ul>
+    <p class="note" data-say>The most common mistake: listing 15 random factors with no buckets. Three buckets with three sub-points each sounds organized, and it's easy to remember under pressure.</p>
+  </div>
+</section>
+
+<!-- 05 SORT DRILL -->
+<section class="step" id="sort">
+  <div class="sh"><span class="idx">05</span><h2>Framework practice: sort the factors</h2><button class="btn small listen" type="button">Listen</button></div>
+  <p class="sub" data-say>A quick drill to build the habit. Put each factor in the bucket where it belongs in a profit framework: Revenue, Costs, or Other. Then check your answers.</p>
+  <ul class="sorter" id="sorter"></ul>
+  <div class="sortbar"><button class="btn primary small" type="button" id="checkSort">Check my sorting</button><button class="btn small" type="button" id="resetSort">Start over</button><span class="sortscore" id="sortScore" aria-live="polite"></span></div>
+  <p class="note" style="margin-top:12px" data-say>Some factors could fit two buckets. In an interview, what matters is that you put each one somewhere and can explain why.</p>
+</section>
+
+<!-- 06 Q2 EXHIBIT -->
+<section class="step" id="ex1">
+  <div class="sh"><span class="idx">06</span><h2>Question 2: read the exhibit</h2><button class="btn small listen" type="button">Listen</button></div>
+  <div class="iv">
+    <p class="who">Interviewer</p>
+    <p data-say>To dig into what's driving the decline, the team gathered revenue by type of goods, Swift's annual costs, and information on market size and customer demand. What insights can you draw to help Swift prioritize opportunities to improve profits? Feel free to offer hypotheses.</p>
+  </div>
+  <figure class="ex">
+    <div class="ex-h"><span class="ex-t">Annual revenue by segment</span><span class="ex-ref">Exhibit 1a · $ millions</span></div>
+    <div class="legend"><span><i style="background:var(--s1)"></i>Electronics</span><span><i style="background:var(--s2)"></i>Household</span><span><i style="background:var(--fg-2)"></i>Specialty</span></div>
+    <div class="hbar" id="rev"></div>
+  </figure>
+  <figure class="ex">
+    <div class="ex-h"><span class="ex-t">Annual costs</span><span class="ex-ref">Exhibit 1b · $ millions</span></div>
+    <div class="legend"><span><i style="background:var(--s1)"></i>COGS: cost of the goods Swift resells</span><span><i style="background:var(--s2)"></i>OpEx: operating expenses</span><span><i style="background:var(--fg-2)"></i>Fixed costs</span></div>
+    <div class="hbar" id="cost"></div>
+  </figure>
+  <figure class="ex">
+    <div class="ex-h"><span class="ex-t">Market and customer demand by segment</span><span class="ex-ref">Exhibit 1c</span></div>
+    <div class="tblwrap">
+      <table class="segtbl">
+        <thead><tr><th>Segment</th><th class="n">Market size</th><th class="n">Companies in market</th><th class="n">Average order</th><th>Swift's profit margin</th><th>What buyers care about most</th></tr></thead>
+        <tbody>
+          <tr><td>Electronics</td><td class="n">$1,000M</td><td class="n">300</td><td class="n">$1,000 · 20 units</td><td><svg class="hbs" viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="8" r="7" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M8 8V1A7 7 0 0 1 15 8Z" fill="currentColor"/></svg>Low</td><td>Price and service, both fairly important</td></tr>
+          <tr><td>Household</td><td class="n">$500M</td><td class="n">200</td><td class="n">$1,000 · 30 units</td><td><svg class="hbs" viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="8" r="7" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M8 8V1A7 7 0 1 1 1 8Z" fill="currentColor"/></svg>High</td><td>Price most; service medium</td></tr>
+          <tr><td>Specialty</td><td class="n">$200M</td><td class="n">20</td><td class="n">$2,000 · 50 units</td><td><svg class="hbs" viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="8" r="7" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M8 1A7 7 0 0 1 8 15Z" fill="currentColor"/></svg>Medium</td><td>Service most; price less</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <figcaption>Source: case exhibit, rebuilt from the workshop slide. Margins and buying factors were shown as symbols, so they're described in words here.</figcaption>
+  </figure>
+
+  <div class="mc" data-answer="1">
+    <div class="mc-head"><p class="stem" data-say>Which finding should you lead with?</p></div>
+    <div class="opts">
+      <button class="opt" type="button" data-say>Costs went up, and that caused the profit drop.</button>
+      <button class="opt" type="button" data-say>Revenue fell 10 million, and all of the drop came from electronics, which fell by a third. Specialty actually grew.</button>
+      <button class="opt" type="button" data-say>Household is the problem, since it hasn't grown.</button>
+      <button class="opt" type="button" data-say>Specialty is shrinking because its market is small.</button>
+    </div>
+    <div class="why" hidden>
+      <p data-say>Total costs actually fell, from 96 million to 90. The drop is in revenue: from 110 million to 100. Electronics fell from 45 to 30, down a third. Household held at 30, and specialty grew from 35 to 40. So the problem is concentrated in one segment, and that's where the cheaper rivals are winning.</p>
+    </div>
+  </div>
+
+  <div class="mc" data-answer="2">
+    <div class="mc-head"><p class="stem" data-say>Now the less obvious trend. What does the cost chart tell you?</p></div>
+    <div class="opts">
+      <button class="opt" type="button" data-say>All costs fell in line with revenue, so costs aren't an issue.</button>
+      <button class="opt" type="button" data-say>COGS rose sharply.</button>
+      <button class="opt" type="button" data-say>COGS fell with sales, but operating and fixed costs didn't shrink, so profit fell faster than revenue.</button>
+      <button class="opt" type="button" data-say>Fixed costs are the main cause of the decline.</button>
+    </div>
+    <div class="why" hidden>
+      <p data-say>COGS stays at about 58 percent of revenue, so it falls when sales fall. But OpEx stayed at 15 million, and fixed costs crept up from 16 to 17 million. Revenue fell 10 million and costs only fell 6, so profit dropped from 14 million to 10, and margin from about 13 percent to 10. The costs aren't the cause, but they make the revenue drop hurt more.</p>
+    </div>
+  </div>
+
+  <div class="mc" data-answer="0">
+    <div class="mc-head"><p class="stem" data-say>And the so-what from the segment table?</p></div>
+    <div class="opts">
+      <button class="opt" type="button" data-say>Electronics is a big, low-margin market where price matters, which is where cheaper rivals win. Specialty buyers care most about service, Swift's strength, and household earns the highest margin.</button>
+      <button class="opt" type="button" data-say>Electronics is the biggest market, so Swift should cut prices to win it back.</button>
+      <button class="opt" type="button" data-say>Specialty has only 20 companies, so Swift should exit it.</button>
+      <button class="opt" type="button" data-say>All three segments look the same.</button>
+    </div>
+    <div class="why" hidden>
+      <p data-say>Electronics is the biggest market, but Swift's margin there is low and buyers weigh price heavily, so cutting prices would shrink an already thin margin. Specialty buyers care most about service, and Swift already has about 20 percent of that market. Specialty orders are also twice as big, 2,000 dollars versus 1,000, so each delivery earns more. Household has the highest margin, but its buyers care most about price, so it could be the next target for cheaper rivals.</p>
+    </div>
+  </div>
+
+  <div class="move">
+    <span class="lbl">Then</span>
+    <p data-say>Synthesize all three parts of the exhibit in three or four sentences, ending with a hypothesis.</p>
+    <div class="acts"><button class="btn small timer" type="button" data-secs="90">90s timer</button><button class="btn primary small reveal" type="button" aria-controls="a-ex1" aria-expanded="false">Show how to say it</button></div>
+  </div>
+  <div class="ans" id="a-ex1" hidden>
+    <p class="who">Say it like this</p>
+    <div class="script"><p data-say>"Three things stand out. First, revenue fell 10 million, and it's all electronics, down from 45 to 30, while specialty grew. Second, costs didn't fall as fast: COGS tracks sales, but operating and fixed costs stayed at about 31 to 32 million, so margin fell from about 13 percent to 10. Third, the segment table explains why: electronics is a big, low-margin market where price matters, which is exactly where cheaper rivals win, while specialty buyers value service, Swift's strength. My hypothesis is that Swift should stop fighting on price in electronics, grow household and specialty, and trim the costs that didn't shrink."</p></div>
+    <p class="note" data-say>The workshop's hint was to look for trends that aren't obvious. Here, that's the sticky operating and fixed costs, the bigger specialty orders, and household buyers being price-focused despite the high margin.</p>
+  </div>
+</section>
+
+<!-- 07 MATH CHECK -->
+<section class="step" id="sizing">
+  <div class="sh"><span class="idx">07</span><h2>Math check: the numbers behind the exhibit</h2><button class="btn small listen" type="button">Listen</button></div>
+  <p class="sub" data-say>Interviewers expect you to do this math on your own while reading the exhibit. Try each step out loud before you reveal it.</p>
+  <div class="move">
+    <span class="lbl">Your move</span>
+    <p data-say>Work out profit and margin for each year, where the revenue change came from, and Swift's market share in each segment.</p>
+    <div class="acts"><button class="btn small timer" type="button" data-secs="120">2 min timer</button></div>
+  </div>
+  <div class="stepper" style="margin-top:14px">
+    <ol class="calc">
+      <li class="st" hidden data-say="Step 1. Profit each year. 110 minus 96 is 14 million. 105 minus 92 is 13 million. 100 minus 90 is 10 million."><span class="t">1 · Profit each year</span><span class="f">110 − 96 = 14. 105 − 92 = 13. 100 − 90 = 10</span><span class="r tnum">$14M → $10M</span></li>
+      <li class="st" hidden data-say="Step 2. The change. Profit fell 4 million, which is down about 30 percent in two years."><span class="t">2 · The change</span><span class="f">$14M − $10M = $4M, about 30% down</span><span class="r tnum">−$4M</span></li>
+      <li class="st" hidden data-say="Step 3. Margin. 14 divided by 110 is about 12.7 percent. 10 divided by 100 is 10 percent."><span class="t">3 · Profit margin</span><span class="f">14 ÷ 110 ≈ 12.7%. 10 ÷ 100 = 10%</span><span class="r tnum">13% → 10%</span></li>
+      <li class="st" hidden data-say="Step 4. Where the revenue went. Electronics fell 15 million. Specialty grew 5 million. Household was flat. That nets to minus 10 million."><span class="t">4 · Where revenue went</span><span class="f">Electronics −15, Specialty +5, Household 0</span><span class="r tnum">−$10M</span></li>
+      <li class="st" hidden data-say="Step 5. Sticky costs. COGS is about 58 percent of revenue every year. But OpEx plus fixed costs went from 31 million to 32 million while revenue fell."><span class="t">5 · Sticky costs</span><span class="f">COGS ≈ 58% of revenue each year. OpEx + fixed: 31 → 32</span><span class="r tnum">+$1M</span></li>
+      <li class="st" hidden data-say="Step 6. Market share. Electronics: 30 out of 1,000 is 3 percent. Household: 30 out of 500 is 6 percent. Specialty: 40 out of 200 is 20 percent."><span class="t">6 · Swift's market share</span><span class="f">30 ÷ 1,000 = 3%. 30 ÷ 500 = 6%. 40 ÷ 200 = 20%</span><span class="r tnum">3 · 6 · 20%</span></li>
+    </ol>
+    <div class="row"><button class="btn primary small next" type="button">Reveal step 1 of 6</button><button class="btn small reset" type="button">Start over</button></div>
+  </div>
+
+  <figure class="ex">
+    <div class="ex-h"><span class="ex-t">Swift's profit, worked out from the exhibit</span><span class="ex-ref">$ millions · margin in brackets</span></div>
+    <div class="hbar" id="prof"></div>
+    <figcaption>Revenue minus total costs for each year.</figcaption>
+  </figure>
+
+  <div class="mc" data-answer="2">
+    <div class="mc-head"><p class="stem" data-say>Quick check: what's Swift's market share in specialty?</p></div>
+    <div class="opts">
+      <button class="opt" type="button" data-say>2 percent</button>
+      <button class="opt" type="button" data-say>40 percent</button>
+      <button class="opt" type="button" data-say>20 percent</button>
+      <button class="opt" type="button" data-say>5 percent</button>
+    </div>
+    <div class="why" hidden><p data-say>40 million of Swift sales divided by a 200 million market is 20 percent. Everyday version: if you sell 40 of the 200 cookies sold at a bake sale, you have a fifth of the market.</p></div>
+  </div>
+</section>
+
+<!-- 08 Q3 -->
+<section class="step" id="q3">
+  <div class="sh"><span class="idx">08</span><h2>Question 3: closing the gap</h2><button class="btn small listen" type="button">Listen</button></div>
+  <p class="sub" data-say>This question is new, written for practice in the style of the case. It tests whether you can turn your insights into numbers.</p>
+  <div class="iv">
+    <p class="who">Interviewer</p>
+    <p data-say>Swift needs about 4 million dollars more profit to get back to 14 million. The team has four options. Which ones would you pursue, and do they close the gap?</p>
+  </div>
+  <div class="given">
+    <div><div class="k">Profit today → target</div><div class="v">$10M → $14M</div></div>
+    <div><div class="k">Margin on extra sales: Electronics</div><div class="v">5%</div></div>
+    <div><div class="k">Margin on extra sales: Household</div><div class="v">15%</div></div>
+    <div><div class="k">Margin on extra sales: Specialty</div><div class="v">10%</div></div>
+    <div><div class="k">A · Grow specialty share from 20% to 25%</div><div class="v">+$10M sales</div></div>
+    <div><div class="k">B · Grow household share from 6% to 8%</div><div class="v">+$10M sales</div></div>
+    <div><div class="k">C · Cut electronics prices to win back $15M of sales</div><div class="v">Margin falls to 2%</div></div>
+    <div><div class="k">D · Cut OpEx 10%, return fixed costs to $16M</div><div class="v">Cost savings</div></div>
+    <div><div class="k">Constraint</div><div class="v">Keep service strong</div></div>
+  </div>
+  <p class="src">Practice assumptions. Margins on extra sales already include the extra cost of serving those customers.</p>
+  <div class="move">
+    <span class="lbl">Your move</span>
+    <p data-say>Size each option: extra sales times margin, or the cost saved. Then pick the combination that closes the 4 million gap without hurting service.</p>
+    <div class="acts"><button class="btn small timer" type="button" data-secs="120">2 min timer</button></div>
+  </div>
+  <div class="stepper" style="margin-top:14px">
+    <ol class="calc">
+      <li class="st" hidden data-say="Option A. Specialty. 10 million of extra sales times 10 percent is 1 million dollars."><span class="t">A · Grow specialty</span><span class="f">$10M × 10%</span><span class="r tnum">+$1.0M</span></li>
+      <li class="st" hidden data-say="Option B. Household. 10 million of extra sales times 15 percent is 1.5 million dollars."><span class="t">B · Grow household</span><span class="f">$10M × 15%</span><span class="r tnum">+$1.5M</span></li>
+      <li class="st" hidden data-say="Option C. Electronics price cuts. 15 million times 2 percent is only 300 thousand dollars, and lower prices would also cut margin on the 30 million Swift already sells there. It might even lose money."><span class="t">C · Cut electronics prices</span><span class="f">$15M × 2%, and it squeezes the $30M Swift already sells</span><span class="r tnum">≈ +$0.3M</span></li>
+      <li class="st" hidden data-say="Option D. Costs. 10 percent of 15 million of OpEx is 1.5 million, plus 1 million from bringing fixed costs back to 16. That's 2.5 million dollars."><span class="t">D · Cut sticky costs</span><span class="f">10% × $15M OpEx + ($17M − $16M) fixed</span><span class="r tnum">+$2.5M</span></li>
+      <li class="st" hidden data-say="Best combination. D plus B is 2.5 plus 1.5, which is exactly 4 million dollars. That closes the gap."><span class="t">Best combination</span><span class="f">D + B = $2.5M + $1.5M</span><span class="r tnum">+$4.0M</span></li>
+      <li class="st" hidden data-say="Add A as a cushion. Growing specialty adds another 1 million and plays to Swift's service strength, which protects against further losses in electronics."><span class="t">Cushion</span><span class="f">Add A for $1M more, and it plays to Swift's service edge</span><span class="r tnum">$15M</span></li>
+    </ol>
+    <div class="row"><button class="btn primary small next" type="button">Reveal step 1 of 6</button><button class="btn small reset" type="button">Start over</button></div>
+  </div>
+
+  <figure class="ex">
+    <div class="ex-h"><span class="ex-t">Profit gain by option</span><span class="ex-ref">$ millions a year</span></div>
+    <div class="hbar" id="opts"></div>
+    <figcaption>No single option closes the $4M gap. D and B together do.</figcaption>
+  </figure>
+
+  <div class="mc" data-answer="1">
+    <div class="mc-head"><p class="stem" data-say>Quick check: why is option C, cutting electronics prices, the weakest?</p></div>
+    <div class="opts">
+      <button class="opt" type="button" data-say>Electronics is too small a market.</button>
+      <button class="opt" type="button" data-say>The margin is already thin, and lower prices shrink it on every sale, including the 30 million Swift already sells.</button>
+      <button class="opt" type="button" data-say>Electronics customers don't care about price.</button>
+      <button class="opt" type="button" data-say>It costs too much to deliver electronics.</button>
+    </div>
+    <div class="why" hidden><p data-say>Matching cheaper rivals means fighting on their terms. Swift would earn about 2 cents on each new dollar of sales, and give up margin on what it already sells. Everyday version: a coffee shop that cuts its price to match the gas station sells more cups but earns less on every cup, including the ones it would have sold anyway.</p></div>
+  </div>
+
+  <div class="move">
+    <span class="lbl">Then</span>
+    <p data-say>Summarize the math in two sentences.</p>
+    <div class="acts"><button class="btn primary small reveal" type="button" aria-controls="a-q3" aria-expanded="false">Show how to say it</button></div>
+  </div>
+  <div class="ans" id="a-q3" hidden>
+    <p class="who">Say it like this</p>
+    <div class="script"><p data-say>"Cutting the costs that didn't shrink is worth about 2.5 million, and growing household, the highest-margin segment, adds about 1.5 million, which together close the 4 million gap. Growing specialty adds another million and plays to Swift's service strength, while cutting electronics prices adds almost nothing and puts the margin on existing sales at risk."</p></div>
+  </div>
+</section>
+
+<!-- 09 IDEAS -->
+<section class="step" id="prioritize">
+  <div class="sh"><span class="idx">09</span><h2>Score the ideas</h2><button class="btn small listen" type="button">Listen</button></div>
+  <div class="iv">
+    <p class="who">Interviewer</p>
+    <p data-say>Here are six ideas the team came up with. Score each for ease and impact, from 1 to 5. Which three would you start with?</p>
+  </div>
+  <figure class="ex">
+    <div class="ex-h"><span class="ex-t">Idea map: ease × impact</span><span class="ex-ref">Exhibit 2 · Team's idea list</span></div>
+    <div class="seg" role="group" aria-label="Which scores to plot">
+      <button class="btn small" type="button" id="mMine" aria-pressed="true">Your scores</button>
+      <button class="btn small" type="button" id="mTeam" aria-pressed="false" disabled>Team's scores</button>
+    </div>
+    <div class="heat">
+      <div>
+        <div id="heatmap"></div>
+        <p class="mapnote" id="mapnote">Your dots appear here as you score each idea.</p>
+      </div>
+      <div>
+        <p class="mapnote" style="margin:0 0 6px">Pick E (ease) and I (impact): 1 is low, 5 is high.</p>
+        <ul class="reg scorer" id="scorer"></ul>
+        <p class="mytop" id="mytop" aria-live="polite">Score all six to see your top three.</p>
+        <div class="ramp" aria-hidden="true">Score <i style="background:var(--h1)"></i><i style="background:var(--h2)"></i><i style="background:var(--h3)"></i><i style="background:var(--h4)"></i><i style="background:var(--h5)"></i> higher</div>
+      </div>
+    </div>
+    <figcaption>Score = ease × impact. Ideas are from this practice version; scores are yours to set.</figcaption>
+  </figure>
+  <div class="move">
+    <span class="lbl">Your move</span>
+    <p data-say>Score each idea out loud with a one-line reason, then name your top three.</p>
+    <div class="acts"><button class="btn small timer" type="button" data-secs="90">90s timer</button><button class="btn primary small reveal" type="button" id="rv-prio" aria-controls="a-prio" aria-expanded="false">Show the team's scores</button></div>
+  </div>
+  <div class="ans" id="a-prio" hidden>
+    <p class="who">The team's scores, with reasons</p>
+    <ul class="reg" id="teamlist"></ul>
+    <h3>Say it like this</h3>
+    <div class="script"><p data-say>"I'd start with three. Cut the operating and fixed costs that didn't shrink with sales, because it's in Swift's control and worth about 2.5 million. Grow household, the highest-margin segment. And win more specialty customers, where service matters most. I'd avoid matching rivals' prices in electronics; that's fighting on their terms."</p></div>
+  </div>
+
+  <div class="mc" data-answer="0">
+    <div class="mc-head"><p class="stem" data-say>Which three come first?</p></div>
+    <div class="opts">
+      <button class="opt" type="button" data-say>C, B, and A: cut sticky costs, grow household, and grow specialty.</button>
+      <button class="opt" type="button" data-say>D, E, and F: a no-frills tier, matching prices, and exiting electronics.</button>
+      <button class="opt" type="button" data-say>E, F, and A.</button>
+      <button class="opt" type="button" data-say>All six at once, with equal effort.</button>
+    </div>
+    <div class="why" hidden>
+      <p data-say>C, B, and A score highest and match the math from Question 3. D, a no-frills tier for electronics, is worth testing later. E, matching prices, is easy but destroys margin. F, exiting electronics, would lose 30 million of sales that help pay the fixed costs.</p>
+    </div>
+  </div>
+</section>
+
+<!-- 10 RECOMMEND -->
+<section class="step" id="recommend">
+  <div class="sh"><span class="idx">10</span><h2>The recommendation</h2><button class="btn small listen" type="button">Listen</button></div>
+  <div class="iv">
+    <p class="who">Interviewer</p>
+    <p data-say>The CEO just walked in. You have 60 seconds. What's driving the decline, and what should Swift do?</p>
+  </div>
+  <div class="move">
+    <span class="lbl">Your move</span>
+    <p data-say>Lead with the answer. Then three reasons, the main risk, and next steps.</p>
+    <div class="acts"><button class="btn small timer" type="button" data-secs="60">60s timer</button><button class="btn primary small reveal" type="button" aria-controls="a-rec" aria-expanded="false">Show a strong answer</button></div>
+  </div>
+  <div class="ans" id="a-rec" hidden>
+    <p class="who">Strong answer</p>
+    <div class="struct"><span>Answer</span><span>3 reasons</span><span>Risk</span><span>Next steps</span></div>
+    <div class="script">
+      <p data-say>"Swift's profit fell from 14 million to 10 million because electronics sales dropped by a third to cheaper rivals, while operating and fixed costs didn't shrink. To get back to 14 million, Swift should stop fighting on price in electronics and play to its strengths: cut about 2.5 million of sticky costs, grow household, and win more specialty customers."</p>
+      <p data-say>"First, the decline is concentrated. Electronics fell from 45 million to 30, in a low-margin market where buyers weigh price. Matching rivals there would earn almost nothing."</p>
+      <p data-say>"Second, costs are sticky. COGS falls with sales, but operating and fixed costs stayed at about 32 million. Bringing them back down is worth about 2.5 million, and it's fully in Swift's control."</p>
+      <p data-say>"Third, Swift's strengths point to other segments. Household earns the highest margin and adds about 1.5 million with 2 more points of share. Specialty buyers value service most, and it adds another million."</p>
+      <p data-say>"The main risk is that electronics keeps shrinking and leaves fixed costs spread over fewer sales. So I'd also test a lower-cost delivery option for price-focused electronics buyers. Next steps: run a cost review of OpEx and fixed costs, build account plans for the top household and specialty prospects, and design the electronics test."</p>
+    </div>
+    <h3>The 90-day plan</h3>
+    <div class="road">
+      <div class="phase" data-say><span class="d">Days 1–30</span><b>Cut</b><ul><li>Review every OpEx and fixed cost line.</li><li>Find the 10 percent of OpEx that doesn't help service.</li></ul></div>
+      <div class="phase" data-say><span class="d">Days 31–60</span><b>Grow</b><ul><li>Target the top household and specialty prospects.</li><li>Use service, not price, as the pitch.</li></ul></div>
+      <div class="phase" data-say><span class="d">Days 61–90</span><b>Test</b><ul><li>Pilot a lower-cost delivery option for electronics buyers.</li><li>Track profit monthly against the 14 million goal.</li></ul></div>
+    </div>
+    <h3>Indicators to track</h3>
+    <ul data-say>
+      <li>OpEx plus fixed costs. Target: back to about 29.5 million.</li>
+      <li>Household revenue. Target: up 10 million, to 40 million.</li>
+      <li>Specialty market share. Target: from 20 percent toward 25.</li>
+      <li>Profit margin. Target: back to about 13 percent.</li>
+    </ul>
+  </div>
+</section>
+
+<!-- 11 DRILLS -->
+<section class="step" id="drills">
+  <div class="sh"><span class="idx">11</span><h2>Drills: framework reps and math warm-up</h2><button class="btn small listen" type="button">Listen</button></div>
+  <p class="sub" data-say>Short reps to build speed. For each prompt, take 60 seconds to say three buckets with two or three points each, then compare.</p>
+
+  <div class="drill">
+    <h3>Framework reps</h3>
+    <div class="reps">
+      <div class="rep">
+        <p class="rq" data-say>1. A bakery chain's profits are falling. What would you look at?</p>
+        <div class="acts"><button class="btn small timer" type="button" data-secs="60">60s timer</button><button class="btn primary small reveal" type="button" aria-controls="r1" aria-expanded="false">Show a strong structure</button></div>
+        <div class="ans" id="r1" hidden><div class="drivers">
+          <div data-say><b>Revenue</b><p>Number of customers, visits per customer, and spend per visit. Which products sell, and did prices change?</p></div>
+          <div data-say><b>Costs</b><p>Ingredients like flour and butter, staff wages, and rent. Which went up?</p></div>
+          <div data-say><b>Outside factors</b><p>New competitors nearby, changing tastes like low-sugar diets, and delivery apps.</p></div>
+          <div data-say><b>Hypothesis</b><p>"Ingredient costs probably rose faster than prices, so I'd start with costs per item."</p></div>
+        </div></div>
+      </div>
+      <div class="rep">
+        <p class="rq" data-say>2. A gym chain wants to open in a new city. Should it?</p>
+        <div class="acts"><button class="btn small timer" type="button" data-secs="60">60s timer</button><button class="btn primary small reveal" type="button" aria-controls="r2" aria-expanded="false">Show a strong structure</button></div>
+        <div class="ans" id="r2" hidden><div class="drivers">
+          <div data-say><b>Market</b><p>How many people would join, how fast the market is growing, and who the competitors are.</p></div>
+          <div data-say><b>Customers</b><p>Who they are, what they'd pay each month, and what they care about.</p></div>
+          <div data-say><b>Economics</b><p>Cost to open, members needed to break even, and payback time.</p></div>
+          <div data-say><b>Ability to win and risks</b><p>Brand recognition, finding good locations, and how rivals might respond.</p></div>
+        </div></div>
+      </div>
+      <div class="rep">
+        <p class="rq" data-say>3. A hospital's emergency room wait times doubled. Why?</p>
+        <div class="acts"><button class="btn small timer" type="button" data-secs="60">60s timer</button><button class="btn primary small reveal" type="button" aria-controls="r3" aria-expanded="false">Show a strong structure</button></div>
+        <div class="ans" id="r3" hidden><div class="drivers">
+          <div data-say><b>Demand</b><p>More patients arriving, sicker patients, or a nearby clinic that closed.</p></div>
+          <div data-say><b>Capacity</b><p>Fewer doctors and nurses on shift, or fewer beds available.</p></div>
+          <div data-say><b>Process</b><p>Slow check-in or triage, waiting on tests, or patients stuck waiting to be admitted.</p></div>
+          <div data-say><b>Hypothesis</b><p>"If arrivals are flat, the problem is inside: staffing or a bottleneck in the process."</p></div>
+        </div></div>
+      </div>
+      <div class="rep">
+        <p class="rq" data-say>4. A distributor like Swift is thinking about buying a smaller rival. Should it?</p>
+        <div class="acts"><button class="btn small timer" type="button" data-secs="60">60s timer</button><button class="btn primary small reveal" type="button" aria-controls="r4" aria-expanded="false">Show a strong structure</button></div>
+        <div class="ans" id="r4" hidden><div class="drivers">
+          <div data-say><b>Market</b><p>Is the rival's segment growing and profitable?</p></div>
+          <div data-say><b>Target</b><p>Its customers, margins, and service quality. Does it fit Swift's brand?</p></div>
+          <div data-say><b>Synergies</b><p>Shared warehouses and trucks, and selling more to each other's customers.</p></div>
+          <div data-say><b>Price and risks</b><p>Is the price fair, and can the two companies be combined without hurting service?</p></div>
+        </div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="drill">
+    <h3>Math warm-up: tricks from the workshop</h3>
+    <div class="drivers">
+      <div data-say><b>Adding</b><p>Pair numbers that make tens first. 7 plus 13 plus 6 plus 4 is 20 plus 10, which is 30.</p></div>
+      <div data-say><b>Subtracting from round numbers</b><p>For 1,000 minus 437, do 999 minus 437, which is 562, then add 1 to get 563.</p></div>
+      <div data-say><b>Multiplying</b><p>Split it: 16 times 7 is 10 times 7 plus 6 times 7, so 70 plus 42 is 112. Set zeros aside: 30 times 400 is 3 times 4, then add three zeros, so 12,000.</p></div>
+      <div data-say><b>Percents and dividing</b><p>Find 10 percent first: 30 percent of 250 is 3 times 25, or 75. 25 percent is a quarter. To divide by 5, double it and divide by 10.</p></div>
+    </div>
+    <p class="h-sec">Try these, no calculator</p>
+    <div id="mathqs"></div>
+  </div>
+</section>
+
+<!-- 12 TEST -->
+<section class="step test" id="test">
+  <div class="sh"><span class="idx">12</span><h2>Practice test</h2><button class="btn small listen" type="button">Listen</button></div>
+  <p class="sub" data-say>Twelve multiple-choice questions on frameworks and the Swift case. Pick an answer to see the explanation.</p>
+  <div class="scorebar"><span class="score" id="score">0 / 0<small>answered 0 of 12</small></span><button class="btn small" type="button" id="resetTest">Reset test</button></div>
+  <div id="testq"></div>
+  <div class="done" id="done" hidden></div>
+</section>
+
+</div>
+</main>
+
+<footer>
+  <div class="wrap">
+    <p>A practice version of the Swift Distribution group case from a McKinsey recruiting workshop, rebuilt from your photos for personal study. It isn't official McKinsey material, so keep it private. The exhibit numbers come from the workshop slide; the clarifying answers, Question 3, the ideas, the drills, and the test are new.</p>
+    <p>Night-before tip: redo Question 1 out loud from memory, then the sort drill, then the test.</p>
+  </div>
+</footer>
+<div id="tip" hidden role="tooltip"></div>
+
+<script>
+(function(){
+  "use strict";
+  const $=(s,r=document)=>r.querySelector(s), $$=(s,r=document)=>[...r.querySelectorAll(s)];
+  const NS="http://www.w3.org/2000/svg";
+  const svgEl=(t,a={})=>{const e=document.createElementNS(NS,t);for(const k in a)e.setAttribute(k,a[k]);return e;};
+  const LET="ABCD";
+
+  /* ---------- tooltip ---------- */
+  const tip=$("#tip");
+  function showTip(el,x,y){tip.textContent=el.getAttribute("data-tip");tip.hidden=false;
+    const w=tip.offsetWidth,h=tip.offsetHeight;let L=x+12,T=y-h-10;
+    if(L+w>innerWidth-8)L=x-w-12; if(T<8)T=y+14; tip.style.left=Math.max(8,L)+"px";tip.style.top=T+"px";}
+  document.addEventListener("pointermove",e=>{const t=e.target.closest&&e.target.closest("[data-tip]");if(t)showTip(t,e.clientX,e.clientY);else tip.hidden=true;});
+  document.addEventListener("focusin",e=>{const t=e.target.closest&&e.target.closest("[data-tip]");if(t){const r=t.getBoundingClientRect();showTip(t,r.left+r.width/2,r.top);}});
+  document.addEventListener("focusout",()=>{tip.hidden=true;});
+  addEventListener("scroll",()=>{tip.hidden=true;},{passive:true});
+
+  /* ---------- reveal toggles ---------- */
+  $$(".reveal").forEach(b=>{const t=document.getElementById(b.getAttribute("aria-controls"));const show=b.textContent;
+    const hide=show.startsWith("Show as")?"Hide table":"Hide";
+    b.addEventListener("click",()=>{const open=t.hidden;t.hidden=!open;b.setAttribute("aria-expanded",String(open));b.textContent=open?hide:show;});});
+
+  /* ---------- timers ---------- */
+  let actx=null;
+  function beep(){try{actx=actx||new (window.AudioContext||window.webkitAudioContext)();const o=actx.createOscillator(),g=actx.createGain();o.frequency.value=880;g.gain.setValueAtTime(.0001,actx.currentTime);g.gain.exponentialRampToValueAtTime(.2,actx.currentTime+.02);g.gain.exponentialRampToValueAtTime(.0001,actx.currentTime+.5);o.connect(g).connect(actx.destination);o.start();o.stop(actx.currentTime+.55);}catch(e){}}
+  $$(".timer").forEach(b=>{const secs=+b.dataset.secs,label=b.textContent;let id=null,left=0;
+    const fmt=s=>Math.floor(s/60)+":"+String(s%60).padStart(2,"0");
+    b.addEventListener("click",()=>{
+      if(id){clearInterval(id);id=null;b.textContent=label;b.setAttribute("aria-pressed","false");return;}
+      try{actx=actx||new (window.AudioContext||window.webkitAudioContext)();}catch(e){}
+      left=secs;b.textContent=fmt(left)+" · stop";b.setAttribute("aria-pressed","true");
+      id=setInterval(()=>{left--;if(left<=0){clearInterval(id);id=null;b.textContent="Time. Answer now";b.setAttribute("aria-pressed","false");beep();setTimeout(()=>{if(!id)b.textContent=label;},4000);return;}b.textContent=fmt(left)+" · stop";},1000);
+    });});
+
+  /* ---------- steppers ---------- */
+  $$(".stepper").forEach(s=>{const steps=$$(".st",s),next=$(".next",s),reset=$(".reset",s);let i=0;
+    const upd=()=>{next.hidden=i>=steps.length;next.textContent="Reveal step "+(i+1)+" of "+steps.length;};
+    next.addEventListener("click",()=>{if(i<steps.length){steps[i].hidden=false;i++;upd();}});
+    reset.addEventListener("click",()=>{steps.forEach(x=>x.hidden=true);i=0;upd();});upd();});
+
+
+  /* ---------- chart builders ---------- */
+  function niceMax(m){const steps=[1,1.5,2,2.5,3,4,5,6,8,10,12,15,20,25,30,40,50,60,80,100,120,150,200,250,300,400,500,600,800,1000,1200,1500,2000];for(const s of steps)if(s>=m)return s;return Math.ceil(m/500)*500;}
+  function roundTop(x,y,w,h,r){r=Math.min(r,h,w/2);return `M${x},${y+h}V${y+r}Q${x},${y} ${x+r},${y}H${x+w-r}Q${x+w},${y} ${x+w},${y+r}V${y+h}Z`;}
+  function multiples(el,Q,SER){
+    SER.forEach(s=>{
+      const f=s.f||(v=>String(v)),n=s.v.length,last=n-1;
+      const card=document.createElement("div");card.className="mini";
+      card.innerHTML=`<div class="nm">${s.k}</div><div class="ch">${f(s.v[0])} → ${f(s.v[last])}</div>`;
+      const W=200,H=104,top=18,bot=20,pl=4,pr=4,ph=H-top-bot,band=(W-pl-pr)/n,bw=Math.min(22,band*.58),max=niceMax(Math.max(...s.v)*1.12);
+      const svg=svgEl("svg",{viewBox:`0 0 ${W} ${H}`,role:"img","aria-label":`${s.k}: ${s.v.map((v,i)=>Q[i]+" "+f(v)).join(", ")}`});
+      s.v.forEach((v,i)=>{const cx=pl+band*i+band/2,h=Math.max(1,v/max*ph),x=cx-bw/2,y=top+ph-h;
+        svg.appendChild(svgEl("path",{d:roundTop(x,y,bw,h,4),fill:"var(--s1)"}));
+        if(i===0||i===last){const t=svgEl("text",{x:cx,y:y-5,"text-anchor":"middle","font-size":"10.5","font-weight":"600",fill:"var(--fg-2)"});t.textContent=f(v);svg.appendChild(t);}
+        const q=svgEl("text",{x:cx,y:H-5,"text-anchor":"middle","font-size":n>5?"8.5":"9.5",fill:"var(--muted)"});q.textContent=Q[i];svg.appendChild(q);
+        svg.appendChild(svgEl("rect",{x:pl+band*i,y:0,width:band,height:H,fill:"transparent","data-tip":`${s.k} · ${Q[i]}: ${f(v)}`}));
+      });
+      svg.insertBefore(svgEl("line",{x1:0,x2:W,y1:top+ph+.5,y2:top+ph+.5,stroke:"var(--axis)","stroke-width":"1"}),svg.firstChild);
+      card.appendChild(svg);el.appendChild(card);
+    });
+  }
+  function multTable(el,Q,SER){
+    el.innerHTML=`<table><thead><tr><th>Measure</th>${Q.map(q=>`<th class="n">${q}</th>`).join("")}</tr></thead><tbody>${SER.map(s=>`<tr><td>${s.k}</td>${s.v.map(v=>`<td class="n">${(s.f||String)(v)}</td>`).join("")}</tr>`).join("")}</tbody></table>`;
+  }
+  function axis(el,o){const ax=document.createElement("div");ax.className="axis";
+    ax.innerHTML=`<div></div><div class="ticks">${o.ticks.map(v=>`<span style="left:${v/o.max*100}%">${o.tick(v)}</span>`).join("")}</div>`;el.appendChild(ax);
+    if(o.ref&&o.ref.note){const p=document.createElement("p");p.className="tolnote";p.textContent=o.ref.note;el.appendChild(p);}}
+  /* one bar per row: rows {d,t,v,lab,tip,st:{bad,txt}} */
+  function hbar(el,rows,o){
+    rows.forEach(r=>{const row=document.createElement("div");row.className="hrow";const w=r.v/o.max*100;
+      row.innerHTML=`<div class="hlab"><b>${r.d}</b>${r.t?`<span>${r.t}</span>`:""}${r.st?`<span class="status ${r.st.bad?"bad":"ok"}">${r.st.bad?"▲ ":"✓ "}${r.st.txt}</span>`:""}</div>
+        <div class="track" tabindex="0" data-tip="${r.tip||r.d+": "+r.lab}"><div class="bar" style="width:${Math.max(.4,w)}%"></div><span class="bval" style="left:${w}%">${r.lab}</span>${o.ref?`<div class="tol" style="left:${o.ref.at/o.max*100}%"></div>`:""}</div>`;
+      el.appendChild(row);});
+    axis(el,o);
+  }
+  /* stacked segments, total named in the label: rows {n,d,seg:[[v,cls,tip]]} */
+  function stack(el,rows,o){
+    rows.forEach(r=>{const row=document.createElement("div");row.className="hrow";let x=0,bars="";
+      r.seg.forEach(([v,c,t],i)=>{const left=x/o.max*100,w=v/o.max*100;
+        bars+=`<div class="bar ${c}" tabindex="0" data-tip="${t}" style="left:calc(${left}% + ${i?2:0}px);width:calc(${w}% - ${i?2:0}px);border-radius:${i===r.seg.length-1?"0 4px 4px 0":"0"}"></div>`;x+=v;});
+      row.innerHTML=`<div class="hlab"><b>${r.n}</b><span>${r.d}</span></div><div class="track">${bars}${o.ref?`<div class="tol" style="left:${o.ref.at/o.max*100}%"></div>`:""}</div>`;
+      el.appendChild(row);});
+    axis(el,o);
+  }
+  /* waterfall: rows {n,d,total} or {n,d,delta}; totals neutral, ups blue, downs orange */
+  function waterfall(el,rows,o){let run=0;
+    rows.forEach(r=>{const row=document.createElement("div");row.className="hrow";let bar,lab,tip;
+      if(r.total!==undefined){run=r.total;bar=`<div class="bar b3" style="width:${r.total/o.max*100}%"></div>`;lab=`<span class="bval" style="left:${r.total/o.max*100}%">${o.fmt(r.total)}</span>`;tip=`${r.n}: ${o.fmt(r.total)}`;}
+      else{const a=Math.min(run,run+r.delta),b=Math.max(run,run+r.delta);
+        bar=`<div class="bar ${r.delta<0?"b2":""}" style="left:${a/o.max*100}%;width:${(b-a)/o.max*100}%;border-radius:3px"></div>`;
+        lab=`<span class="bval" style="left:${b/o.max*100}%">${r.delta<0?"−":"+"}${o.fmt(Math.abs(r.delta))}</span>`;tip=`${r.n}: ${r.delta<0?"−":"+"}${o.fmt(Math.abs(r.delta))}`;run+=r.delta;}
+      row.innerHTML=`<div class="hlab"><b>${r.n}</b><span>${r.d}</span></div><div class="track" tabindex="0" data-tip="${tip}">${bar}${lab}</div>`;
+      el.appendChild(row);});
+    axis(el,o);
+  }
+
+  /* ---------- heat map you score ---------- */
+  function heatScorer(HM){
+    const band=s=>s>=20?5:s>=15?4:s>=9?3:s>=5?2:1;
+    const C=54,ox=84,oy=8,G=C*5,HW=ox+G+8,HH=oy+G+52;
+    const hs=svgEl("svg",{viewBox:`0 0 ${HW} ${HH}`,role:"img","aria-label":"Heat map"});
+    for(let X=1;X<=5;X++)for(let Y=1;Y<=5;Y++)
+      hs.appendChild(svgEl("rect",{x:ox+(X-1)*C+1,y:oy+(5-Y)*C+1,width:C-2,height:C-2,rx:3,fill:`var(--h${band(X*Y)})`}));
+    for(let k=1;k<=5;k++){
+      const t=svgEl("text",{x:ox+(k-.5)*C,y:oy+G+15,"text-anchor":"middle","font-size":"11",fill:"var(--fg-2)"});t.textContent=k;hs.appendChild(t);
+      if(HM.lx[k-1]){const t2=svgEl("text",{x:ox+(k-.5)*C,y:oy+G+28,"text-anchor":"middle","font-size":"9.5",fill:"var(--muted)"});t2.textContent=HM.lx[k-1];hs.appendChild(t2);}
+      const u=svgEl("text",{x:ox-8,y:oy+(5-k+.5)*C+4,"text-anchor":"end","font-size":"11",fill:"var(--fg-2)"});u.textContent=k;hs.appendChild(u);
+      if(HM.ly[k-1]){const u2=svgEl("text",{x:ox-20,y:oy+(5-k+.5)*C+4,"text-anchor":"end","font-size":"9.5",fill:"var(--muted)"});u2.textContent=HM.ly[k-1];hs.appendChild(u2);}
+    }
+    const xt=svgEl("text",{x:ox+G/2,y:oy+G+46,"text-anchor":"middle","font-size":"11","font-weight":"600",fill:"var(--fg)"});xt.textContent=HM.xName+" →";hs.appendChild(xt);
+    const yt=svgEl("text",{x:9,y:oy+G/2,"text-anchor":"middle","font-size":"11","font-weight":"600",fill:"var(--fg)",transform:`rotate(-90 9 ${oy+G/2})`});yt.textContent=HM.yName+" →";hs.appendChild(yt);
+    const dots=svgEl("g");hs.appendChild(dots);$("#heatmap").appendChild(hs);
+    const IT=HM.items,xn=HM.xName.toLowerCase(),yn=HM.yName.toLowerCase();
+    const opt=lab=>`<option value="">${lab}</option>`+[1,2,3,4,5].map(v=>`<option value="${v}">${v}</option>`).join("");
+    $("#scorer").innerHTML=IT.map(r=>`<li><span class="id">${r.id}</span><span class="nm">${r.n}</span><span class="pick"><select id="x-${r.id}" aria-label="${r.id} ${xn}, 1 to 5">${opt(HM.xs)}</select><select id="y-${r.id}" aria-label="${r.id} ${yn}, 1 to 5">${opt(HM.ys)}</select><span class="sc" id="s-${r.id}">–</span></span></li>`).join("");
+    const rank=(a,b)=>b.x*b.y-a.x*a.y||b.y-a.y;
+    $("#teamlist").innerHTML=[...IT].sort(rank).map(r=>`<li data-say="${r.id}. ${r.n}. ${HM.xName} ${r.x}, ${yn} ${r.y}, score ${r.x*r.y}. ${r.w}"><span class="id">${r.id}</span><span class="nm"><b>${r.n}</b><span class="w">${r.w}</span></span><span class="sc">${r.x}×${r.y} = ${r.x*r.y}</span></li>`).join("");
+    let mode="mine";
+    const mine=()=>IT.map(r=>({id:r.id,n:r.n,x:+$("#x-"+r.id).value,y:+$("#y-"+r.id).value})).filter(r=>r.x&&r.y);
+    const offsets=n=>n<=1?[[0,0]]:n===2?[[-12,0],[12,0]]:n<=4?[[-12,-11],[12,-11],[-12,11],[12,11]]:[[-15,-11],[0,-11],[15,-11],[-15,11],[0,11],[15,11]];
+    function plot(list){
+      while(dots.firstChild)dots.removeChild(dots.firstChild);
+      const cells={};list.forEach(r=>{const k=r.x+"-"+r.y;(cells[k]=cells[k]||[]).push(r);});
+      Object.values(cells).forEach(arr=>{const off=offsets(arr.length),big=arr.length===1,rad=big?14:arr.length<=4?10:8;
+        arr.forEach((r,j)=>{const cx=ox+(r.x-.5)*C+off[j][0],cy=oy+(5-r.y+.5)*C+off[j][1];
+          const g=svgEl("g",{tabindex:"0","data-tip":`${r.id} · ${r.n}: ${xn} ${r.x}, ${yn} ${r.y}, score ${r.x*r.y}`});
+          g.appendChild(svgEl("circle",{cx,cy,r:rad+2,fill:"var(--surface)"}));
+          g.appendChild(svgEl("circle",{cx,cy,r:rad,fill:"var(--dot)"}));
+          const t=svgEl("text",{x:cx,y:cy+(big?4:3),"text-anchor":"middle","font-size":big?"11":"8.5","font-weight":"600",fill:"var(--dot-ink)"});t.textContent=r.id;g.appendChild(t);
+          dots.appendChild(g);});});
+      hs.setAttribute("aria-label",`Heat map of ${xn} by ${yn}, ${mode==="team"?"team's scores":"your scores"}. `+(list.length?list.map(r=>`${r.id}: ${xn} ${r.x}, ${yn} ${r.y}`).join(". "):"Nothing scored yet."));
+    }
+    function render(){
+      const m=mine();
+      IT.forEach(r=>{const x=+$("#x-"+r.id).value,y=+$("#y-"+r.id).value;$("#s-"+r.id).textContent=x&&y?"= "+x*y:"–";});
+      const top=$("#mytop");
+      if(!m.length)top.textContent=`Score all ${IT.length} to see your top three.`;
+      else if(m.length<IT.length)top.textContent=`Scored ${m.length} of ${IT.length}. Score all ${IT.length} to see your top three.`;
+      else top.textContent="Your top three by score: "+[...m].sort(rank).slice(0,3).map(r=>`${r.id} (${r.x*r.y})`).join(", ")+".";
+      const note=$("#mapnote");
+      if(mode==="team"){plot(IT);note.textContent="Showing the team's scores. Switch back to compare with yours.";}
+      else{plot(m);note.textContent=m.length?"Showing your scores. Shared cells show dots side by side.":"Your dots appear here as you score each one.";}
+    }
+    function setMode(v){mode=v;$("#mMine").setAttribute("aria-pressed",String(v==="mine"));$("#mTeam").setAttribute("aria-pressed",String(v==="team"));render();}
+    $("#scorer").addEventListener("change",()=>{if(mode!=="mine")setMode("mine");else render();});
+    $("#mMine").addEventListener("click",()=>setMode("mine"));
+    $("#mTeam").addEventListener("click",()=>{if(!$("#mTeam").disabled)setMode("team");});
+    $("#rv-prio").addEventListener("click",()=>{$("#mTeam").disabled=false;setMode($("#a-prio").hidden?"mine":"team");});
+    render();
+  }
+
+  const PAGEKEY="swift";
+  /* Exhibit 1a and 1b */
+  const yrs=["Two years ago","Last year","This year"];
+  const REV=[[45,30,35],[35,30,40],[30,30,40]];
+  stack($("#rev"),REV.map((r,i)=>({n:yrs[i],d:`Electronics ${r[0]} · Household ${r[1]} · Specialty ${r[2]} = $${r[0]+r[1]+r[2]}M`,
+    seg:[[r[0],"",`${yrs[i]} · Electronics: $${r[0]}M`],[r[1],"b2",`${yrs[i]} · Household: $${r[1]}M`],[r[2],"b3",`${yrs[i]} · Specialty: $${r[2]}M`]]})),
+    {max:120,ticks:[0,30,60,90,120],tick:v=>"$"+v+"M"});
+  const COST=[[65,15,16],[61,15,16],[58,15,17]];
+  stack($("#cost"),COST.map((r,i)=>({n:yrs[i],d:`COGS ${r[0]} · OpEx ${r[1]} · Fixed ${r[2]} = $${r[0]+r[1]+r[2]}M`,
+    seg:[[r[0],"",`${yrs[i]} · COGS: $${r[0]}M`],[r[1],"b2",`${yrs[i]} · OpEx: $${r[1]}M`],[r[2],"b3",`${yrs[i]} · Fixed costs: $${r[2]}M`]]})),
+    {max:120,ticks:[0,30,60,90,120],tick:v=>"$"+v+"M"});
+
+  /* Math check: profit */
+  hbar($("#prof"),[
+    {d:"Two years ago",t:"$110M − $96M",v:14,lab:"$14M (12.7%)"},
+    {d:"Last year",t:"$105M − $92M",v:13,lab:"$13M (12.4%)"},
+    {d:"This year",t:"$100M − $90M",v:10,lab:"$10M (10%)"},
+  ],{max:20,ticks:[0,5,10,15,20],tick:v=>"$"+v+"M"});
+
+  /* Q3 options */
+  hbar($("#opts"),[
+    {d:"D · Cut sticky costs",t:"10% of OpEx + fixed back to $16M",v:2.5,lab:"+$2.5M"},
+    {d:"B · Grow household",t:"$10M × 15%",v:1.5,lab:"+$1.5M"},
+    {d:"A · Grow specialty",t:"$10M × 10%",v:1,lab:"+$1.0M"},
+    {d:"C · Cut electronics prices",t:"$15M × 2%, before losses on existing sales",v:.3,lab:"≈ +$0.3M"},
+  ],{max:4,ticks:[0,1,2,3,4],tick:v=>"$"+v+"M",ref:{at:4,note:"Vertical line = the $4M gap to close"}});
+
+  /* Sort drill */
+  const SORT=[
+    {t:"Which product categories bring in the most revenue",a:"Revenue",w:"Product mix is a revenue question: which categories sell, and how much."},
+    {t:"Whether price per unit or units sold has changed",a:"Revenue",w:"Revenue is price times volume, so both belong on the revenue side."},
+    {t:"Sales mix by customer type, like supermarkets vs. specialty stores",a:"Revenue",w:"Different customers order different amounts, which changes revenue."},
+    {t:"Customer satisfaction and the number of customers",a:"Revenue",w:"Losing customers or attracting fewer new ones shows up in revenue."},
+    {t:"Warehouse leases",a:"Costs",w:"A fixed cost: Swift pays it whether sales go up or down."},
+    {t:"Trucking and fuel",a:"Costs",w:"A variable cost: it rises with every delivery."},
+    {t:"Technology and staff salaries",a:"Costs",w:"Mostly fixed costs that don't shrink when sales fall."},
+    {t:"A recession or inflation pushing costs up",a:"Costs",w:"An outside force, but it shows up as higher costs."},
+    {t:"What suppliers charge Swift for products",a:"Costs",w:"That's COGS, the biggest cost line."},
+    {t:"Competitors' prices and market share",a:"Other",w:"Competitors sit in the \"other\" bucket. They affect both revenue and costs, so they get their own home."},
+    {t:"Changes to Swift's teams or key departments",a:"Other",w:"Internal organization. A reorganization can quietly hurt service or sales."},
+    {t:"How Swift uses technology to manage distribution",a:"Other",w:"Technology as a capability, not a cost: does it help Swift serve customers better than rivals?"},
+  ];
+  const sorter=$("#sorter");
+  sorter.innerHTML=SORT.map((s,i)=>`<li><span class="t">${s.t}</span><select id="sort-${i}" aria-label="Bucket for: ${s.t.replace(/"/g,"")}"><option value="">Pick a bucket</option><option>Revenue</option><option>Costs</option><option>Other</option></select><p class="fb" hidden></p></li>`).join("");
+  $("#checkSort").addEventListener("click",()=>{let right=0,done=0;
+    SORT.forEach((s,i)=>{const li=sorter.children[i],v=$("#sort-"+i).value,fb=$(".fb",li);li.classList.remove("ok","bad");
+      if(!v){fb.hidden=true;return;}done++;const ok=v===s.a;if(ok)right++;li.classList.add(ok?"ok":"bad");
+      fb.innerHTML=`<span class="fbtag ${ok?"ok":"bad"}">${ok?"✓ Right":"✕ "+s.a}</span>${s.w}`;fb.hidden=false;});
+    $("#sortScore").textContent=done?`${right} of ${done} right${done<SORT.length?` · ${SORT.length-done} left to sort`:""}`:"Pick a bucket for each factor first.";});
+  $("#resetSort").addEventListener("click",()=>{SORT.forEach((s,i)=>{const li=sorter.children[i];li.classList.remove("ok","bad");$("#sort-"+i).value="";$(".fb",li).hidden=true;});$("#sortScore").textContent="";});
+
+  /* Math warm-up */
+  const MQ=[
+    {q:"8 + 14 + 12 + 6 + 19",a:59,tol:0,h:"(8 + 12) + (14 + 6) + 19 = 20 + 20 + 19 = 59"},
+    {q:"1,000 − 368",a:632,tol:0,h:"999 − 368 = 631, then add 1: 632"},
+    {q:"18 × 6",a:108,tol:0,h:"10 × 6 + 8 × 6 = 60 + 48 = 108"},
+    {q:"40% of 350",a:140,tol:0,h:"10% is 35, so 40% is 4 × 35 = 140"},
+    {q:"260 ÷ 5",a:52,tol:0,h:"Double it to 520, then divide by 10: 52"},
+    {q:"Swift's margin two years ago: 14 ÷ 110, as a percent",a:12.7,tol:.6,h:"14 ÷ 110 is a bit under 14 ÷ 100 = 14%. About 12.7%"},
+  ];
+  $("#mathqs").innerHTML=MQ.map((m,i)=>`<div class="mathq"><span class="q">${m.q}</span><input id="mq-${i}" inputmode="decimal" aria-label="Your answer to ${m.q}" autocomplete="off"><button class="btn small" type="button" data-mq="${i}">Check</button><p class="fb" hidden></p></div>`).join("");
+  $("#mathqs").addEventListener("click",e=>{const b=e.target.closest("[data-mq]");if(!b)return;const i=+b.dataset.mq,m=MQ[i],row=b.closest(".mathq"),fb=$(".fb",row);
+    const raw=$("#mq-"+i).value.replace(/[,%\s$]/g,"");const v=parseFloat(raw);
+    if(raw===""||isNaN(v)){fb.innerHTML="Type a number first.";fb.hidden=false;return;}
+    const ok=Math.abs(v-m.a)<=m.tol;fb.innerHTML=`<span class="fbtag ${ok?"ok":"bad"}">${ok?"✓ Right":"✕ Answer: "+m.a}</span>${m.h}`;fb.hidden=false;});
+  $("#mathqs").addEventListener("keydown",e=>{if(e.key==="Enter"&&e.target.matches("input")){e.preventDefault();e.target.parentElement.querySelector("[data-mq]").click();}});
+
+  /* Ideas scorer */
+  heatScorer({xName:"Ease",yName:"Impact",xs:"E",ys:"I",lx:["Hard","","Medium","","Easy"],ly:["Small","","Medium","","Big"],items:[
+    {id:"A",n:"Win more specialty customers, where service matters most",x:4,y:3,w:"Plays to Swift's strength, but the market is small and Swift already has 20% of it."},
+    {id:"B",n:"Grow household, the highest-margin segment",x:3,y:4,w:"Every extra dollar earns 15 cents. Buyers are price-focused, so it takes a sharp pitch."},
+    {id:"C",n:"Cut operating and fixed costs that didn't shrink with sales",x:4,y:4,w:"About $2.5M, fully in Swift's control. Protect anything that drives service."},
+    {id:"D",n:"Offer a cheaper, no-frills delivery option for electronics buyers",x:2,y:3,w:"Could win back price-focused buyers without cutting prices for everyone. Needs a test first."},
+    {id:"E",n:"Match low-cost competitors' prices in electronics",x:5,y:1,w:"Easy to do, but earns about 2 cents a dollar and cuts margin on existing sales."},
+    {id:"F",n:"Exit electronics entirely",x:2,y:2,w:"Loses $30M of sales that help pay fixed costs. Too risky for now."},
+  ]});
+
+  const TEST=[
+    {q:"What was Swift's profit this year?",o:["$100M","$10M","$14M","$90M"],a:1,w:"Revenue of $100M minus costs of $90M is $10M."},
+    {q:"Which segment drove the revenue decline?",o:["Household","Specialty","Electronics","All three equally"],a:2,w:"Electronics fell from $45M to $30M. Household was flat, and specialty grew."},
+    {q:"What's Swift's market share in specialty?",o:["2%","20%","40%","4%"],a:1,w:"$40M of sales in a $200M market is 20%."},
+    {q:"Which costs didn't shrink as revenue fell?",o:["COGS","OpEx and fixed costs","All costs rose","None; every cost fell with sales"],a:1,w:"COGS fell with sales, but OpEx stayed at $15M and fixed costs rose from $16M to $17M."},
+    {q:"Which segment earns Swift the highest margin?",o:["Electronics","Household","Specialty","They're all the same"],a:1,w:"Household shows the fullest Harvey ball. Its buyers also care most about price, which makes it a target for cheaper rivals."},
+    {q:"In which segment do buyers care most about service?",o:["Electronics","Household","Specialty","None"],a:2,w:"Specialty buyers rank service highest, which fits Swift's main strength."},
+    {q:"Swift's profit margin two years ago was about…",o:["14%","11%","12.7%","9%"],a:2,w:"$14M ÷ $110M ≈ 12.7%. It's now 10%."},
+    {q:"In a profit framework, warehouse leases belong under…",o:["Revenue","Costs","Other","Customers"],a:1,w:"It's a fixed cost: Swift pays it no matter how much it sells."},
+    {q:"Competitors' pricing and market share belong under…",o:["Revenue","Costs","Other: outside factors","Suppliers"],a:2,w:"Competitors affect both sides of profit, so they get their own bucket."},
+    {q:"Why is matching cheaper rivals' prices in electronics risky?",o:["The margin is already thin, and lower prices cut it on every sale, including existing ones","Electronics buyers don't care about price","It's illegal","It costs more to deliver electronics"],a:0,w:"Swift would fight on the rivals' terms and give up its service advantage."},
+    {q:"Using the workshop's trick, what's 25% of 640?",o:["120","160","180","250"],a:1,w:"25% is a quarter. 640 ÷ 4 = 160."},
+    {q:"Which is the strongest opening line for your recommendation?",o:["Let me walk you through everything I looked at.","There are many factors behind the decline.","It depends on what the CEO wants.","Profit fell because electronics dropped by a third and costs didn't shrink. Swift should cut sticky costs and grow household and specialty."],a:3,w:"Lead with the answer: the cause and the fix, in one or two sentences."},
+  ];
+  const testq=$("#testq");
+  TEST.forEach((t,n)=>{const d=document.createElement("div");d.className="mc";d.dataset.answer=t.a;d.dataset.group="test";
+    d.innerHTML=`<div class="mc-head"><p class="stem" data-say="Question ${n+1}. ${t.q.replace(/"/g,"&quot;")}"><span class="qn">Q${n+1}</span>${t.q}</p><button class="btn small qlisten" type="button" aria-label="Listen to question ${n+1}">Listen</button></div>
+      <div class="opts">${t.o.map(o=>`<button class="opt" type="button" data-say="${o.replace(/"/g,"&quot;")}">${o}</button>`).join("")}</div>
+      <div class="why" hidden><p data-say="${t.w.replace(/"/g,"&quot;")}">${t.w}</p></div>`;
+    testq.appendChild(d);});
+
+  /* ---------- multiple choice engine ---------- */
+  function setupMC(mc){const opts=$$(".opt",mc);
+    opts.forEach((o,i)=>{if(!o.querySelector(".L")){const x=document.createElement("span");x.className="x";while(o.firstChild)x.appendChild(o.firstChild);
+        const L=document.createElement("span");L.className="L";L.textContent=LET[i];o.append(L,x);
+        o.dataset.say=LET[i]+". "+(o.dataset.say||x.textContent);}
+      o.addEventListener("click",()=>answer(mc,i));});}
+  function answer(mc,i){if(mc.dataset.done)return;mc.dataset.done="1";const a=+mc.dataset.answer,opts=$$(".opt",mc);
+    opts.forEach((o,k)=>{o.disabled=true;if(k===a){o.classList.add("right");o.insertAdjacentHTML("beforeend",`<span class="tag">✓ ${k===i?"Correct":"Answer"}</span>`);}
+      else if(k===i){o.classList.add("wrong");o.insertAdjacentHTML("beforeend",`<span class="tag">✕ Your pick</span>`);}});
+    mc.dataset.correct=String(i===a);$(".why",mc).hidden=false;if(mc.dataset.group==="test")score();}
+  function resetMC(mc){delete mc.dataset.done;delete mc.dataset.correct;$$(".opt",mc).forEach(o=>{o.disabled=false;o.classList.remove("right","wrong");const t=$(".tag",o);if(t)t.remove();});$(".why",mc).hidden=true;}
+  $$(".mc").forEach(setupMC);
+  function score(){const qs=$$('.mc[data-group="test"]'),done=qs.filter(q=>q.dataset.done),right=done.filter(q=>q.dataset.correct==="true").length;
+    $("#score").innerHTML=`${right} / ${done.length}<small>answered ${done.length} of ${qs.length}</small>`;
+    const box=$("#done");if(done.length===qs.length){box.hidden=false;
+      box.innerHTML=`<b>${right} of ${qs.length}.</b> `+(right>=11?"You're ready. Run the recommendation in step 09 out loud once more and get some sleep.":right>=8?"Solid. Re-read the explanations you missed, then run steps 04 and 09 out loud.":"Go back to the primer in step 01, then retake the test. The terms will stick on the second pass.");}
+    else box.hidden=true;}
+  $("#resetTest").addEventListener("click",()=>{$$('.mc[data-group="test"]').forEach(resetMC);score();$("#test").scrollIntoView();});
+  score();
+
+  /* ---------- read aloud, with a voice menu ---------- */
+  const synth=window.speechSynthesis,rateSel=$("#rate"),vSel=$("#voicePick");
+  try{const r=localStorage.getItem(PAGEKEY+"-rate");if(r)rateSel.value=r;}catch(e){}
+  rateSel.addEventListener("change",()=>{try{localStorage.setItem(PAGEKEY+"-rate",rateSel.value);}catch(e){}});
+  let speakingBtn=null,voice=null,voices=[];
+  const vrank=v=>(/natural|neural/i.test(v.name)?0:/premium/i.test(v.name)?1:/enhanced/i.test(v.name)?2:/google/i.test(v.name)?3:4)+(/^en[-_]US/i.test(v.lang)?0:.5);
+  function loadVoices(){
+    if(!synth)return;
+    voices=synth.getVoices().filter(v=>/^en/i.test(v.lang)).sort((a,b)=>vrank(a)-vrank(b)||a.name.localeCompare(b.name));
+    if(!vSel)return;
+    let saved=null;try{saved=localStorage.getItem(PAGEKEY+"-voice");}catch(e){}
+    vSel.innerHTML=voices.length?voices.map((v,i)=>`<option value="${i}">${v.name.replace(/[<>&"]/g,"")}${vrank(v)<2?" (natural)":""}</option>`).join(""):'<option value="">Browser default</option>';
+    let idx=voices.findIndex(v=>v.name===saved);if(idx<0)idx=0;
+    if(voices.length)vSel.value=String(idx);voice=voices[idx]||null;
+  }
+  if(vSel)vSel.addEventListener("change",()=>{voice=voices[+vSel.value]||null;try{localStorage.setItem(PAGEKEY+"-voice",voice?voice.name:"");}catch(e){}});
+  loadVoices();
+  if(synth&&"onvoiceschanged" in synth)synth.addEventListener("voiceschanged",loadVoices);
+  function textOf(el){return(el.getAttribute("data-say")||el.innerText||"").replace(/\s+/g," ").trim();}
+  function visible(el){return!!(el.offsetWidth||el.offsetHeight||el.getClientRects().length);}
+  function stop(){if(synth)synth.cancel();if(speakingBtn){speakingBtn.textContent=speakingBtn.dataset.label;speakingBtn.setAttribute("aria-pressed","false");speakingBtn=null;}}
+  function speakChunks(btn,chunks){
+    if(!synth||!chunks.length)return;
+    if(speakingBtn===btn){stop();return;}
+    stop();
+    speakingBtn=btn;btn.dataset.label=btn.dataset.label||btn.textContent;btn.textContent="Stop";btn.setAttribute("aria-pressed","true");
+    chunks.forEach((c,i)=>{const u=new SpeechSynthesisUtterance(c);u.rate=+rateSel.value;if(voice){u.voice=voice;u.lang=voice.lang;}else u.lang="en-US";
+      if(i===chunks.length-1)u.onend=()=>{if(speakingBtn===btn)stop();};synth.speak(u);});
+  }
+  function speak(btn,els){const chunks=[];els.filter(visible).forEach(el=>{textOf(el).split(/(?<=[.?!])\s+(?=[A-Z0-9"“])/).forEach(c=>{if(c)chunks.push(c);});});speakChunks(btn,chunks);}
+  if(!synth){$$(".listen,.qlisten").forEach(b=>b.hidden=true);$(".speed").hidden=true;const vb=$(".voicebar");if(vb)vb.hidden=true;}
+  else{
+    $$(".listen").forEach(b=>{b.dataset.label=b.textContent;b.addEventListener("click",()=>{const sec=b.closest("section");speak(b,$$("[data-say]",sec).filter(el=>!el.parentElement.closest("[data-say]")));});});
+    document.addEventListener("click",e=>{const b=e.target.closest(".qlisten");if(!b)return;const mc=b.closest(".mc");speak(b,$$("[data-say]",mc).filter(el=>!el.parentElement.closest("[data-say]")));});
+    const vt=$("#voiceTest");if(vt){vt.dataset.label=vt.textContent;vt.addEventListener("click",()=>speakChunks(vt,["Hi. This is how I'll read your case.","Pick another voice if this one sounds robotic."]));}
+  }
+  /* ---------- rail highlight ---------- */
+  const chips=$$("#chips a"),map=new Map(chips.map(a=>[a.getAttribute("href").slice(1),a]));
+  if("IntersectionObserver" in window){
+    const io=new IntersectionObserver(es=>{es.forEach(en=>{if(en.isIntersecting){chips.forEach(c=>c.classList.remove("on"));const a=map.get(en.target.id);if(a){a.classList.add("on");const p=a.parentElement;p.scrollTo({left:a.offsetLeft-p.clientWidth/2+a.offsetWidth/2,behavior:"smooth"});}}});},{rootMargin:"-45% 0px -50% 0px"});
+    $$("section.step").forEach(s=>io.observe(s));
+  }
+})();
+</script>
+<script src="tts.js"></script>
+<script src="chat.js"></script>
+</body></html>
