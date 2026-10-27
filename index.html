@@ -378,7 +378,7 @@ footer{padding-block:40px 64px;border-top:1px solid var(--line);font-size:14px;c
   <div class="rail-in">
     <a class="home-pill" href="/">All cases</a>
     <div class="chips" id="chips">
-      <a href="#primer">Primer</a><a href="#prompt">Prompt</a><a href="#clarify">Clarify</a><a href="#framework">Q1 Framework</a><a href="#sort">Sort drill</a><a href="#ex1">Q2 Exhibit</a><a href="#sizing">Math check</a><a href="#q3">Q3</a><a href="#prioritize">Ideas</a><a href="#recommend">Recommend</a><a href="#drills">Drills</a><a href="#test">Test</a>
+      <a href="#primer">Primer</a><a href="#prompt">Prompt</a><a href="#clarify">Clarify</a><a href="#framework">Q1 Framework</a><a href="#sort">Sort drill</a><a href="#ex1">Q2 Exhibit</a><a href="#sizing">Math check</a><a href="#q3">Q3</a><a href="#prioritize">Ideas</a><a href="#recommend">Recommend</a><a href="#drills">Drills</a><a href="#test">Test</a><a href="#lastcheck">Last check</a>
     </div>
     <label class="speed" for="rate"><span>Speed</span>
       <select id="rate" aria-label="Read-aloud speed">
@@ -913,13 +913,22 @@ footer{padding-block:40px 64px;border-top:1px solid var(--line);font-size:14px;c
   <div class="done" id="done" hidden></div>
 </section>
 
+<!-- 13 LAST CHECK: SORT THE FRAMEWORK -->
+<section class="step" id="lastcheck">
+  <div class="sh"><span class="idx">13</span><h2>End-of-case check: sort the framework</h2><button class="btn small listen" type="button">Listen</button></div>
+  <p class="sub" data-say>One last rep before you call the case done. Fresh factors, same drill as section 05: put each one in the bucket where it belongs in a profit framework, Revenue, Costs, or Other, then check your answers.</p>
+  <ul class="sorter" id="sorter2"></ul>
+  <div class="sortbar"><button class="btn primary small" type="button" id="checkSort2">Check my sorting</button><button class="btn small" type="button" id="resetSort2">Start over</button><span class="sortscore" id="sortScore2" aria-live="polite"></span></div>
+  <p class="note" style="margin-top:12px" data-say>Same rule as before: some factors could fit two buckets. What matters is that you place each one and can defend the call out loud.</p>
+</section>
+
 </div>
 </main>
 
 <footer>
   <div class="wrap">
     <p>A practice version of the Swift Distribution group case from a McKinsey recruiting workshop, rebuilt from your photos for personal study. It isn't official McKinsey material, so keep it private. The exhibit numbers come from the workshop slide; the clarifying answers, Question 3, the ideas, the drills, and the test are new.</p>
-    <p>Night-before tip: redo Question 1 out loud from memory, then the sort drill, then the test.</p>
+    <p>Night-before tip: redo Question 1 out loud from memory, then the sort drill, then the test, then the end-of-case sort check.</p>
   </div>
 </footer>
 <div id="tip" hidden role="tooltip"></div>
@@ -1126,6 +1135,28 @@ footer{padding-block:40px 64px;border-top:1px solid var(--line);font-size:14px;c
       fb.innerHTML=`<span class="fbtag ${ok?"ok":"bad"}">${ok?"✓ Right":"✕ "+s.a}</span>${s.w}`;fb.hidden=false;});
     $("#sortScore").textContent=done?`${right} of ${done} right${done<SORT.length?` · ${SORT.length-done} left to sort`:""}`:"Pick a bucket for each factor first.";});
   $("#resetSort").addEventListener("click",()=>{SORT.forEach((s,i)=>{const li=sorter.children[i];li.classList.remove("ok","bad");$("#sort-"+i).value="";$(".fb",li).hidden=true;});$("#sortScore").textContent="";});
+
+  /* End-of-case check: second sorter, fresh factors */
+  const SORT2=[
+    {t:"The average order size in each segment",a:"Revenue",w:"Bigger orders mean more revenue per delivery, so this drives the top line."},
+    {t:"How many new customers Swift wins each year",a:"Revenue",w:"New customers add sales, so it lands in revenue."},
+    {t:"Swift's share of the specialty market",a:"Revenue",w:"Swift's own sales volume is a revenue lever, even though rivals set the market around it."},
+    {t:"Depreciation on Swift's delivery fleet",a:"Costs",w:"A fixed cost: the trucks age on a schedule whether they roll or not."},
+    {t:"Packaging and handling materials",a:"Costs",w:"A variable cost: it rises with every order Swift ships."},
+    {t:"Insurance on the warehouses",a:"Costs",w:"A fixed cost Swift pays no matter what sales do."},
+    {t:"Fuel surcharges from shipping partners",a:"Costs",w:"A variable cost that tracks delivery volume."},
+    {t:"A new law capping delivery-driver hours",a:"Other",w:"An outside force. It hits costs and capacity, but it isn't a line inside the P&L."},
+    {t:"A big rival launching same-day delivery",a:"Other",w:"Competitors get their own bucket: they shape both revenue and costs from the outside."},
+    {t:"Driver morale and turnover",a:"Other",w:"Internal organization: turnover can quietly raise costs and hurt service."},
+  ];
+  const sorter2=$("#sorter2");
+  sorter2.innerHTML=SORT2.map((s,i)=>`<li><span class="t">${s.t}</span><select id="sort2-${i}" aria-label="Bucket for: ${s.t.replace(/"/g,"")}"><option value="">Pick a bucket</option><option>Revenue</option><option>Costs</option><option>Other</option></select><p class="fb" hidden></p></li>`).join("");
+  $("#checkSort2").addEventListener("click",()=>{let right=0,done=0;
+    SORT2.forEach((s,i)=>{const li=sorter2.children[i],v=$("#sort2-"+i).value,fb=$(".fb",li);li.classList.remove("ok","bad");
+      if(!v){fb.hidden=true;return;}done++;const ok=v===s.a;if(ok)right++;li.classList.add(ok?"ok":"bad");
+      fb.innerHTML=`<span class="fbtag ${ok?"ok":"bad"}">${ok?"✓ Right":"✕ "+s.a}</span>${s.w}`;fb.hidden=false;});
+    $("#sortScore2").textContent=done?`${right} of ${done} right${done<SORT2.length?` · ${SORT2.length-done} left to sort`:""}`:"Pick a bucket for each factor first.";});
+  $("#resetSort2").addEventListener("click",()=>{SORT2.forEach((s,i)=>{const li=sorter2.children[i];li.classList.remove("ok","bad");$("#sort2-"+i).value="";$(".fb",li).hidden=true;});$("#sortScore2").textContent="";});
 
   /* Math warm-up */
   const MQ=[
