@@ -1,4 +1,4 @@
-<!doctype html><html><head><meta charset="utf-8"><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}.home-pill{font:600 12px var(--mono,-apple-system);padding:5px 11px;border-radius:999px;color:#fff;background:var(--accent,#0d6b61);text-decoration:none;white-space:nowrap;margin-right:12px}
+<!doctype html><html><head><meta charset="utf-8"><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:calc(env(safe-area-inset-top,0px) + 56px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}.home-pill{font:600 12px var(--mono,-apple-system);padding:5px 11px;border-radius:999px;color:#fff;background:var(--accent,#0d6b61);text-decoration:none;white-space:nowrap;margin-right:12px}
 </style></head><body>
 <title>Swift Distribution Practice Case</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -275,6 +275,7 @@ footer{padding-block:40px 64px;border-top:1px solid var(--line);font-size:14px;c
 }
 @media (max-width:600px){
   body{font-size:16px}
+  .rail-in{padding:6px 12px}
   .how{grid-template-columns:minmax(0,1fr)}
   .split,.vocab,.drivers{grid-template-columns:minmax(0,1fr)}
   .cycle{grid-template-columns:repeat(2,minmax(0,1fr))}
@@ -378,7 +379,7 @@ footer{padding-block:40px 64px;border-top:1px solid var(--line);font-size:14px;c
   <div class="rail-in">
     <a class="home-pill" href="/">All cases</a>
     <div class="chips" id="chips">
-      <a href="#primer">Primer</a><a href="#prompt">Prompt</a><a href="#clarify">Clarify</a><a href="#framework">Q1 Framework</a><a href="#sort">Sort drill</a><a href="#ex1">Q2 Exhibit</a><a href="#sizing">Math check</a><a href="#q3">Q3</a><a href="#prioritize">Ideas</a><a href="#recommend">Recommend</a><a href="#drills">Drills</a><a href="#test">Test</a><a href="#lastcheck">Last check</a>
+      <a href="#primer">Primer</a><a href="#prompt">Prompt</a><a href="#clarify">Clarify</a><a href="#framework">Q1 Framework</a><a href="#ex1">Q2 Exhibit</a><a href="#sizing">Math check</a><a href="#q3">Q3</a><a href="#prioritize">Ideas</a><a href="#recommend">Recommend</a><a href="#drills">Drills</a><a href="#test">Test</a><a href="#lastcheck">Last check</a>
     </div>
     <label class="speed" for="rate"><span>Speed</span>
       <select id="rate" aria-label="Read-aloud speed">
@@ -553,18 +554,9 @@ footer{padding-block:40px 64px;border-top:1px solid var(--line);font-size:14px;c
   </div>
 </section>
 
-<!-- 05 SORT DRILL -->
-<section class="step" id="sort">
-  <div class="sh"><span class="idx">05</span><h2>Framework practice: sort the factors</h2><button class="btn small listen" type="button">Listen</button></div>
-  <p class="sub" data-say>A quick drill to build the habit. Put each factor in the bucket where it belongs in a profit framework: Revenue, Costs, or Other. Then check your answers.</p>
-  <ul class="sorter" id="sorter"></ul>
-  <div class="sortbar"><button class="btn primary small" type="button" id="checkSort">Check my sorting</button><button class="btn small" type="button" id="resetSort">Start over</button><span class="sortscore" id="sortScore" aria-live="polite"></span></div>
-  <p class="note" style="margin-top:12px" data-say>Some factors could fit two buckets. In an interview, what matters is that you put each one somewhere and can explain why.</p>
-</section>
-
 <!-- 06 Q2 EXHIBIT -->
 <section class="step" id="ex1">
-  <div class="sh"><span class="idx">06</span><h2>Question 2: read the exhibit</h2><button class="btn small listen" type="button">Listen</button></div>
+  <div class="sh"><span class="idx">05</span><h2>Question 2: read the exhibit</h2><button class="btn small listen" type="button">Listen</button></div>
   <div class="iv">
     <p class="who">Interviewer</p>
     <p data-say>To dig into what's driving the decline, the team gathered revenue by type of goods, Swift's annual costs, and information on market size and customer demand. What insights can you draw to help Swift prioritize opportunities to improve profits? Feel free to offer hypotheses.</p>
@@ -647,7 +639,7 @@ footer{padding-block:40px 64px;border-top:1px solid var(--line);font-size:14px;c
 
 <!-- 07 MATH CHECK -->
 <section class="step" id="sizing">
-  <div class="sh"><span class="idx">07</span><h2>Math check: the numbers behind the exhibit</h2><button class="btn small listen" type="button">Listen</button></div>
+  <div class="sh"><span class="idx">06</span><h2>Math check: the numbers behind the exhibit</h2><button class="btn small listen" type="button">Listen</button></div>
   <p class="sub" data-say>Interviewers expect you to do this math on your own while reading the exhibit. Try each step out loud before you reveal it.</p>
   <div class="move">
     <span class="lbl">Your move</span>
@@ -686,7 +678,7 @@ footer{padding-block:40px 64px;border-top:1px solid var(--line);font-size:14px;c
 
 <!-- 08 Q3 -->
 <section class="step" id="q3">
-  <div class="sh"><span class="idx">08</span><h2>Question 3: closing the gap</h2><button class="btn small listen" type="button">Listen</button></div>
+  <div class="sh"><span class="idx">07</span><h2>Question 3: closing the gap</h2><button class="btn small listen" type="button">Listen</button></div>
   <p class="sub" data-say>This question is new, written for practice in the style of the case. It tests whether you can turn your insights into numbers.</p>
   <div class="iv">
     <p class="who">Interviewer</p>
@@ -751,7 +743,7 @@ footer{padding-block:40px 64px;border-top:1px solid var(--line);font-size:14px;c
 
 <!-- 09 IDEAS -->
 <section class="step" id="prioritize">
-  <div class="sh"><span class="idx">09</span><h2>Score the ideas</h2><button class="btn small listen" type="button">Listen</button></div>
+  <div class="sh"><span class="idx">08</span><h2>Score the ideas</h2><button class="btn small listen" type="button">Listen</button></div>
   <div class="iv">
     <p class="who">Interviewer</p>
     <p data-say>Here are six ideas the team came up with. Score each for ease and impact, from 1 to 5. Which three would you start with?</p>
@@ -804,7 +796,7 @@ footer{padding-block:40px 64px;border-top:1px solid var(--line);font-size:14px;c
 
 <!-- 10 RECOMMEND -->
 <section class="step" id="recommend">
-  <div class="sh"><span class="idx">10</span><h2>The recommendation</h2><button class="btn small listen" type="button">Listen</button></div>
+  <div class="sh"><span class="idx">09</span><h2>The recommendation</h2><button class="btn small listen" type="button">Listen</button></div>
   <div class="iv">
     <p class="who">Interviewer</p>
     <p data-say>The CEO just walked in. You have 60 seconds. What's driving the decline, and what should Swift do?</p>
@@ -842,7 +834,7 @@ footer{padding-block:40px 64px;border-top:1px solid var(--line);font-size:14px;c
 
 <!-- 11 DRILLS -->
 <section class="step" id="drills">
-  <div class="sh"><span class="idx">11</span><h2>Drills: framework reps and math warm-up</h2><button class="btn small listen" type="button">Listen</button></div>
+  <div class="sh"><span class="idx">10</span><h2>Drills: framework reps and math warm-up</h2><button class="btn small listen" type="button">Listen</button></div>
   <p class="sub" data-say>Short reps to build speed. For each prompt, take 60 seconds to say three buckets with two or three points each, then compare.</p>
 
   <div class="drill">
@@ -906,7 +898,7 @@ footer{padding-block:40px 64px;border-top:1px solid var(--line);font-size:14px;c
 
 <!-- 12 TEST -->
 <section class="step test" id="test">
-  <div class="sh"><span class="idx">12</span><h2>Practice test</h2><button class="btn small listen" type="button">Listen</button></div>
+  <div class="sh"><span class="idx">11</span><h2>Practice test</h2><button class="btn small listen" type="button">Listen</button></div>
   <p class="sub" data-say>Twelve multiple-choice questions on frameworks and the Swift case. Pick an answer to see the explanation.</p>
   <div class="scorebar"><span class="score" id="score">0 / 0<small>answered 0 of 12</small></span><button class="btn small" type="button" id="resetTest">Reset test</button></div>
   <div id="testq"></div>
@@ -915,11 +907,11 @@ footer{padding-block:40px 64px;border-top:1px solid var(--line);font-size:14px;c
 
 <!-- 13 LAST CHECK: SORT THE FRAMEWORK -->
 <section class="step" id="lastcheck">
-  <div class="sh"><span class="idx">13</span><h2>End-of-case check: sort the framework</h2><button class="btn small listen" type="button">Listen</button></div>
-  <p class="sub" data-say>One last rep before you call the case done. Fresh factors, same drill as section 05: put each one in the bucket where it belongs in a profit framework, Revenue, Costs, or Other, then check your answers.</p>
+  <div class="sh"><span class="idx">12</span><h2>End-of-case check: sort the framework</h2><button class="btn small listen" type="button">Listen</button></div>
+  <p class="sub" data-say>One last rep before you call the case done. Fresh factors from across the whole case: put each one in the bucket where it belongs in a profit framework, Revenue, Costs, or Other, then check your answers.</p>
   <ul class="sorter" id="sorter2"></ul>
   <div class="sortbar"><button class="btn primary small" type="button" id="checkSort2">Check my sorting</button><button class="btn small" type="button" id="resetSort2">Start over</button><span class="sortscore" id="sortScore2" aria-live="polite"></span></div>
-  <p class="note" style="margin-top:12px" data-say>Same rule as before: some factors could fit two buckets. What matters is that you place each one and can defend the call out loud.</p>
+  <p class="note" style="margin-top:12px" data-say>Some factors could fit two buckets. In an interview, what matters is that you place each one and can defend the call out loud.</p>
 </section>
 
 </div>
@@ -928,7 +920,7 @@ footer{padding-block:40px 64px;border-top:1px solid var(--line);font-size:14px;c
 <footer>
   <div class="wrap">
     <p>A practice version of the Swift Distribution group case from a McKinsey recruiting workshop, rebuilt from your photos for personal study. It isn't official McKinsey material, so keep it private. The exhibit numbers come from the workshop slide; the clarifying answers, Question 3, the ideas, the drills, and the test are new.</p>
-    <p>Night-before tip: redo Question 1 out loud from memory, then the sort drill, then the test, then the end-of-case sort check.</p>
+    <p>Night-before tip: redo Question 1 out loud from memory, then the test, then the end-of-case sort check.</p>
   </div>
 </footer>
 <div id="tip" hidden role="tooltip"></div>
@@ -1112,32 +1104,15 @@ footer{padding-block:40px 64px;border-top:1px solid var(--line);font-size:14px;c
     {d:"C · Cut electronics prices",t:"$15M × 2%, before losses on existing sales",v:.3,lab:"≈ +$0.3M"},
   ],{max:4,ticks:[0,1,2,3,4],tick:v=>"$"+v+"M",ref:{at:4,note:"Vertical line = the $4M gap to close"}});
 
-  /* Sort drill */
-  const SORT=[
-    {t:"Which product categories bring in the most revenue",a:"Revenue",w:"Product mix is a revenue question: which categories sell, and how much."},
-    {t:"Whether price per unit or units sold has changed",a:"Revenue",w:"Revenue is price times volume, so both belong on the revenue side."},
-    {t:"Sales mix by customer type, like supermarkets vs. specialty stores",a:"Revenue",w:"Different customers order different amounts, which changes revenue."},
-    {t:"Customer satisfaction and the number of customers",a:"Revenue",w:"Losing customers or attracting fewer new ones shows up in revenue."},
-    {t:"Warehouse leases",a:"Costs",w:"A fixed cost: Swift pays it whether sales go up or down."},
-    {t:"Trucking and fuel",a:"Costs",w:"A variable cost: it rises with every delivery."},
-    {t:"Technology and staff salaries",a:"Costs",w:"Mostly fixed costs that don't shrink when sales fall."},
-    {t:"A recession or inflation pushing costs up",a:"Costs",w:"An outside force, but it shows up as higher costs."},
-    {t:"What suppliers charge Swift for products",a:"Costs",w:"That's COGS, the biggest cost line."},
-    {t:"Competitors' prices and market share",a:"Other",w:"Competitors sit in the \"other\" bucket. They affect both revenue and costs, so they get their own home."},
-    {t:"Changes to Swift's teams or key departments",a:"Other",w:"Internal organization. A reorganization can quietly hurt service or sales."},
-    {t:"How Swift uses technology to manage distribution",a:"Other",w:"Technology as a capability, not a cost: does it help Swift serve customers better than rivals?"},
-  ];
-  const sorter=$("#sorter");
-  sorter.innerHTML=SORT.map((s,i)=>`<li><span class="t">${s.t}</span><select id="sort-${i}" aria-label="Bucket for: ${s.t.replace(/"/g,"")}"><option value="">Pick a bucket</option><option>Revenue</option><option>Costs</option><option>Other</option></select><p class="fb" hidden></p></li>`).join("");
-  $("#checkSort").addEventListener("click",()=>{let right=0,done=0;
-    SORT.forEach((s,i)=>{const li=sorter.children[i],v=$("#sort-"+i).value,fb=$(".fb",li);li.classList.remove("ok","bad");
-      if(!v){fb.hidden=true;return;}done++;const ok=v===s.a;if(ok)right++;li.classList.add(ok?"ok":"bad");
-      fb.innerHTML=`<span class="fbtag ${ok?"ok":"bad"}">${ok?"✓ Right":"✕ "+s.a}</span>${s.w}`;fb.hidden=false;});
-    $("#sortScore").textContent=done?`${right} of ${done} right${done<SORT.length?` · ${SORT.length-done} left to sort`:""}`:"Pick a bucket for each factor first.";});
-  $("#resetSort").addEventListener("click",()=>{SORT.forEach((s,i)=>{const li=sorter.children[i];li.classList.remove("ok","bad");$("#sort-"+i).value="";$(".fb",li).hidden=true;});$("#sortScore").textContent="";});
-
+  
   /* End-of-case check: second sorter, fresh factors */
   const SORT2=[
+{t:"Whether price per unit or units sold has changed",a:"Revenue",w:"Revenue is price times volume, so both belong on the revenue side."},
+{t:"What suppliers charge Swift for products",a:"Costs",w:"That's COGS, the biggest cost line."},
+{t:"A recession or inflation pushing costs up",a:"Costs",w:"An outside force, but it shows up as higher costs."},
+{t:"Technology and staff salaries",a:"Costs",w:"Mostly fixed costs that don't shrink when sales fall."},
+{t:"Competitors' prices and market share",a:"Other",w:"Competitors sit in the \"other\" bucket. They affect both revenue and costs, so they get their own home."},
+{t:"How Swift uses technology to manage distribution",a:"Other",w:"Technology as a capability, not a cost: does it help Swift serve customers better than rivals?"},
     {t:"The average order size in each segment",a:"Revenue",w:"Bigger orders mean more revenue per delivery, so this drives the top line."},
     {t:"How many new customers Swift wins each year",a:"Revenue",w:"New customers add sales, so it lands in revenue."},
     {t:"Swift's share of the specialty market",a:"Revenue",w:"Swift's own sales volume is a revenue lever, even though rivals set the market around it."},
